@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Ajith Chandran — designer working on brand, product and image-making out of Bangalore. All things design." />
+<title>Ajith Chandran — all things design</title>
+<link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
+<style>
+  :root {
+    --bg: #fbfbfb;
+    --fg: #111;
+    --label: #000;
+    --meta: #5c5c5c;
+    --dim: #b8b8b8;
+    --line: #e5e5e5;
+    --tile: #ececec;
+    --tile2: #d8d8d8;
+    --cursor-fill: rgba(0, 0, 0, 0.16);
+
+    --mono: "ff-attribute-mono", "JetBrains Mono", ui-monospace, monospace;
+    --grotesk: "neuzeit-grotesk", "Inter", system-ui, sans-serif;
+  }
+
+  /* Dark theme — toggled by clicking the eye logo. */
+  body.dark {
+    --bg: #0e0e0e;
+    --fg: #f4f4f4;
+    --label: #ffffff;
+    --meta: #9aa0a8;
+    --dim: #3a3a3a;
+    --line: #232323;
+    --tile: #1c1c1c;
+    --tile2: #262626;
+    --cursor-fill: rgba(255, 255, 255, 0.18);
+  }
+
+  /* In dark mode, the eye becomes muted grey instead of stark white.
+     Spiral stays var(--bg) so its dark-on-grey contrast still reads. */
+  body.dark .logo-wrap .eye-fill {
+    fill: #9a9a9a;
+  }
+
+  html, body {
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--grotesk);
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  html, body { height: 100vh; overflow: hidden; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0;
+    align-items: stretch;
+    padding: 0;
+    max-width: none;
+    height: 100vh;
+  }
+  .col-about { padding: 40px 40px 24px; }
+  .col-work  { padding: 40px 40px 24px; }
+  .col-work section:last-child { margin-bottom: 0; }
+  /* col-recent: top padding matches col-work so first image aligns with "projects" heading.
+     Sides still flush; bottom bleeds. */
+  .col-recent { padding-top: 40px; }
+  .col {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;          /* Firefox */
+    -ms-overflow-style: none;       /* IE/old Edge */
+    scroll-behavior: smooth;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .col::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+  .col-about { gap: 0; }
+  .col-work { gap: 40px; }
+  .col-recent { gap: 0; }
+  .col-recent .img-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .col-recent .img-card {
+    display: block;
+    transform-origin: center;
+    transform: skewY(var(--skew, 0deg)) scaleY(var(--squash, 1));
+    transition: transform 180ms cubic-bezier(.2,.7,.2,1);
+    will-change: transform;
+  }
+  .col-recent .img-frame {
+    margin-bottom: 0;
+  }
+  .col-recent .img-cap {
+    padding: 12px 14px 32px;          /* generous gap before next image */
+  }
+
+  .img-card {
+    text-decoration: none;
+    color: var(--fg);
+    display: block;
+    transition: opacity 0.15s;
+  }
+  /* No color/opacity shift on image hover — keep them solid. */
+  .img-frame {
+    width: 100%;
+    background-color: var(--tile);
+    background-image: linear-gradient(135deg, var(--tile) 0%, var(--tile2) 100%);
+    background-size: cover;
+    background-position: center;
+    position: relative;
+    margin-bottom: 10px;
+  }
+  /* corner label hidden — captions below carry the info now that real images are in */
+  .img-frame::after { content: none; }
+
+  /* All-projects CTA — rounded grey pill, only on mobile/tablet */
+  .all-projects { display: none; }
+  @media (max-width: 1100px) {
+    .all-projects {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      grid-column: 1 / -1;          /* span both columns when in tablet 2-up grid */
+      background: var(--tile);
+      color: var(--label);
+      font-family: var(--mono);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      border-radius: 9999px;
+      padding: 18px 24px;
+      margin-top: 8px;
+      transition: background 0.2s, color 0.2s;
+    }
+    .all-projects:hover {
+      background: var(--label);
+      color: var(--bg);
+    }
+  }
+  .ar-4-3 { aspect-ratio: 4 / 3; }
+  .ar-3-4 { aspect-ratio: 3 / 4; }
+  .ar-1-1 { aspect-ratio: 1 / 1; }
+  .ar-16-9 { aspect-ratio: 16 / 9; }
+
+  .img-cap {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--meta);
+    letter-spacing: 0.02em;
+  }
+  .img-cap strong {
+    color: var(--label);
+    font-weight: 400;
+    margin-right: 8px;
+  }
+
+  /* ---- LOGO: black eye, rotating spiral pupil, blink on hover, burst on click ---- */
+  .logo-wrap {
+    display: inline-block;
+    width: 96px;
+    margin-bottom: 56px;
+    position: relative;
+    cursor: pointer;
+    color: var(--fg);
+  }
+  .logo-wrap svg { display: block; }
+
+  .logo-wrap .eye {
+    width: 100%;
+    height: auto;
+    transform-origin: center;
+    will-change: clip-path;
+    clip-path: inset(0% 0% 0% 0%);
+  }
+  .logo-wrap .eye-fill { fill: var(--fg); }
+
+  .logo-wrap .spiral {
+    fill: var(--bg);
+    transform-box: fill-box;
+    transform-origin: center;
+    will-change: transform;
+    backface-visibility: hidden;
+    /* Rotation driven by JS so speed can scale with cursor proximity to logo. */
+  }
+  @keyframes spin {
+    from { transform: translateZ(0) rotate(0deg); }
+    to   { transform: translateZ(0) rotate(-360deg); }
+  }
+
+  /* Eyelid blink on hover — clip-path inset acts like vertical mask */
+  .logo-wrap:hover .eye {
+    animation:
+      blinkClose 0.16s cubic-bezier(.55, 0, .85, 0.4) forwards,
+      blinkHold  0.06s linear 0.16s forwards,
+      blinkOpen  0.28s cubic-bezier(.2, .9, .4, 1)   0.22s forwards;
+  }
+  @keyframes blinkClose {
+    from { clip-path: inset(0% 0% 0% 0%); }
+    to   { clip-path: inset(50% 0% 50% 0%); }
+  }
+  @keyframes blinkHold {
+    from, to { clip-path: inset(50% 0% 50% 0%); }
+  }
+  @keyframes blinkOpen {
+    from { clip-path: inset(50% 0% 50% 0%); }
+    to   { clip-path: inset(0% 0% 0% 0%); }
+  }
+
+  /* Click glitch — same chromatic look as the loader. Reuses `chroma` keyframe,
+     plays once. PowerGlitch slice is also applied via JS on click for parity. */
+  .logo-wrap.glitching .eye {
+    animation: chroma 1.4s steps(6) 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .logo-wrap .spiral { animation: none; }
+    .logo-wrap:hover .eye { animation: none; }
+    .logo-wrap.bursting .spike-line { animation: none; }
+  }
+
+  /* "Let's talk" — fixed top-right corner of the page */
+  .lets-talk {
+    position: fixed;
+    top: 32px;
+    right: 32px;
+    z-index: 100;
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--label);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .lets-talk:hover { color: var(--meta); border-color: var(--meta); }
+  @media (max-width: 720px) {
+    .lets-talk { top: 20px; right: 20px; font-size: 12px; }
+  }
+
+  /* Name caption — sits between logo and bio paragraphs. */
+  .name {
+    font-family: var(--mono);
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--label);
+    margin-bottom: 18px;
+  }
+  .name-link {
+    color: var(--label);
+    text-decoration: none;
+    border-bottom: 1px solid var(--label);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .name-link:hover { color: var(--meta); border-color: var(--meta); }
+
+  /* ---- INTRO ---- */
+  .intro {
+    font-family: var(--grotesk);
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--fg);
+    margin-bottom: 14px;
+  }
+  .intro:last-of-type { margin-bottom: 0; }
+
+  /* ---- Interesting finds: simple rounded-square favicon links ---- */
+  .interests { margin: 32px 0 0; }
+  .interests h2 {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--meta);
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-bottom: 14px;
+  }
+  .icons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #ffffff;
+    text-decoration: none;
+    display: block;
+    box-shadow: none;
+    border: none;
+    transform-origin: center;
+    transition: transform 0.18s cubic-bezier(.2, .7, .2, 1);
+  }
+  /* Icon stays static on hover — only the preview popup reacts. */
+
+  /* Hover preview popup — fixed-positioned, JS-placed near the hovered icon. */
+  .preview-pop {
+    position: fixed;
+    width: 220px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+    transform-origin: bottom left;
+    transition: transform 0.22s cubic-bezier(.2, .7, .2, 1), opacity 0.16s ease;
+    z-index: 9000;
+  }
+  .preview-pop.is-show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  .preview-pop .preview-img {
+    width: 100%;
+    height: 138px;
+    background-size: cover;
+    background-position: center top;
+    background-color: var(--tile);
+    border-radius: 10px;
+  }
+  .preview-pop .preview-cap {
+    margin-top: 8px;
+    display: inline-block;
+    background: var(--label);
+    color: var(--bg);
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.04em;
+    padding: 4px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    box-shadow: none;
+    filter: none;
+    border: none;
+  }
+
+  /* Pin the elsewhere section to the bottom of col-about (flex column).
+     margin-top: auto pushes it down inside the available space. */
+  .col-about .elsewhere {
+    margin-top: auto;
+    margin-bottom: 0;
+    padding-top: 48px;
+  }
+  .col-about .elsewhere ul { padding-bottom: 0; }
+
+  /* Hide the native cursor on real-pointer devices — the liquid glass circle
+     becomes the only visible pointer. Touch devices keep system behaviour. */
+  @media (hover: hover) and (pointer: fine) {
+    html, body, a, button, label, .logo-wrap, .img-card, .me, .cta {
+      cursor: none;
+    }
+  }
+
+  /* ---- LOADER: theme-aware. Light = black eye on white. Dark = white eye on black. ---- */
+  .loader {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;          /* light theme default */
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .loader.is-gone { display: none; }
+
+  .loader-eye {
+    width: 110px;
+    height: auto;
+    color: #000;                  /* eye fill in light theme */
+    will-change: transform, filter;
+    animation: chroma 1.4s steps(6) infinite;
+  }
+  .loader-eye .eye-fill { fill: currentColor; }
+  .loader-eye .spiral {
+    fill: #ffffff;                /* spiral fill in light theme */
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: spin 12s linear infinite;
+    will-change: transform;
+  }
+
+  /* Dark theme override — black bg, white eye, black spiral. */
+  body.dark .loader { background: #000000; }
+  body.dark .loader-eye { color: #ffffff; }
+  body.dark .loader-eye .spiral { fill: #000000; }
+
+  /* Animated red + blue chromatic split layered on top of PowerGlitch slices */
+  @keyframes chroma {
+    0%, 100% { filter: drop-shadow(2px 0 0 #ff0033) drop-shadow(-2px 0 0 #0066ff); }
+    20%      { filter: drop-shadow(-3px 0 0 #ff0033) drop-shadow(3px 0 0 #0066ff); }
+    40%      { filter: drop-shadow(2px 1px 0 #ff0033) drop-shadow(-2px -1px 0 #0066ff); }
+    60%      { filter: drop-shadow(-2px 1px 0 #ff0033) drop-shadow(2px -1px 0 #0066ff); }
+    80%      { filter: drop-shadow(3px 0 0 #ff0033) drop-shadow(-3px 0 0 #0066ff); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader { display: none !important; }
+  }
+
+  /* Stroke-circle cursor with jelly (spring) follow.
+     Faint fill via --cursor-fill makes it visible on light AND dark surfaces. */
+  .liquid-cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 28px;
+    height: 28px;
+    margin: -14px 0 0 -14px;
+    border-radius: 50%;
+    border: 1.5px solid var(--fg);
+    background: var(--cursor-fill);
+    backdrop-filter: blur(0.5px);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate3d(-200px, -200px, 0);
+    will-change: transform;
+    transition: width 0.3s ease, height 0.3s ease, margin 0.3s ease, border-color 0.3s ease, background 0.3s ease, opacity 0.25s ease;
+    opacity: 0;
+  }
+  .liquid-cursor.is-active { opacity: 1; }
+  .liquid-cursor.is-hover {
+    width: 56px;
+    height: 56px;
+    margin: -28px 0 0 -28px;
+  }
+  @media (hover: none) {
+    .liquid-cursor { display: none; }
+  }
+
+  /* "I'm" hover reveal — small portrait floats up on hover */
+  .me {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px solid var(--label);
+    cursor: none;
+  }
+  .me-photo {
+    position: absolute;
+    bottom: calc(100% + 10px);
+    left: -8px;
+    width: 96px;
+    height: 124px;
+    background-size: cover;
+    background-position: center;
+    background-color: var(--tile);
+    opacity: 0;
+    transform: scale(0.92) translateY(6px);
+    transform-origin: bottom left;
+    transition:
+      opacity 0.18s ease,
+      transform 0.28s cubic-bezier(.2, .7, .2, 1);
+    pointer-events: none;
+    z-index: 4;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  }
+  .me:hover .me-photo {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  /* Touch / no-hover devices: hide the popup, keep the underline as styling */
+  @media (hover: none) {
+    .me-photo { display: none; }
+    .me { border-bottom: none; cursor: text; }
+  }
+  .intro a {
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--label);
+  }
+  .intro a:hover { color: var(--meta); border-color: var(--meta); }
+
+  /* ---- SECTIONS ---- */
+  section {
+    margin-bottom: 40px;
+  }
+  section h2 {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--meta);
+    font-weight: 400;
+    letter-spacing: 0;
+    margin-bottom: 8px;
+  }
+  section ul {
+    list-style: none;
+  }
+  section li {
+    padding: 2px 0;
+  }
+  section a {
+    font-family: var(--grotesk);
+    font-size: 16px;
+    color: var(--fg);
+    text-decoration: none;
+    border-bottom: 1px solid var(--label);
+    transition: color 0.15s, border-color 0.15s;
+  }
+  section a:hover { color: var(--meta); border-color: var(--meta); }
+  section .loading {
+    font-family: var(--grotesk);
+    font-size: 16px;
+    color: var(--dim);
+  }
+
+  /* external link marker removed — links go bare */
+
+  /* view all */
+  section .view-all {
+    margin-top: 12px;
+  }
+  section .view-all a {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--meta);
+    border-bottom: none;
+    letter-spacing: 0.02em;
+  }
+  section .view-all a:hover { color: var(--label); }
+
+  /* ---- TABLET / MOBILE: revert to normal page scroll ---- */
+  @media (max-width: 1100px) {
+    html, body { height: auto; overflow-x: hidden; overflow-y: auto; }
+    .layout {
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      height: auto;
+      padding: 40px;
+    }
+    .col {
+      height: auto;
+      overflow: visible;
+    }
+    .col-about { padding-left: 0; }
+    .col-work  { padding-right: 0; }
+    .col-recent { grid-column: 1 / -1; padding-top: 0; }
+    .col-recent .img-stack {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+  }
+
+  /* ---- PHONE ≤ 720px ---- */
+  @media (max-width: 720px) {
+    .layout {
+      grid-template-columns: 1fr;
+      gap: 40px;
+      padding: 28px 20px 56px;
+    }
+    .col-recent .img-stack {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .col-work { gap: 28px; }
+    .logo-wrap { width: 64px; margin-bottom: 28px; }
+    .intro { margin-bottom: 32px; font-size: 18px; }
+    .name { font-size: 17px; }
+    .lets-talk { font-size: 14px; }
+    .col-recent .img-cap { padding: 10px 0 24px; font-size: 13px; }
+    section h2 { font-size: 15px; }
+    section a { font-size: 18px; }
+    section .loading { font-size: 18px; }
+    section .view-all a { font-size: 14px; }
+  }
+
+  /* ---- SMALL PHONE ≤ 420px ---- */
+  @media (max-width: 420px) {
+    .layout { padding: 24px 16px 48px; gap: 32px; }
+    .logo-wrap { width: 56px; margin-bottom: 24px; }
+    .intro { font-size: 17px; line-height: 1.55; }
+    .name { font-size: 16px; }
+    section h2 { font-size: 14px; }
+    section a, section .loading { font-size: 17px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- LOADER: eye + spiral scaling in, then center-out reveal -->
+<div class="loader" id="loader" aria-hidden="true">
+  <svg class="loader-eye" viewBox="0 0 97.63 66.84" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+    <defs>
+      <clipPath id="loaderPupilClip" clipPathUnits="userSpaceOnUse">
+        <circle cx="48.815" cy="33.42" r="22" />
+      </clipPath>
+    </defs>
+    <path class="eye-fill" d="M48.82,63.63c2.79,0,5.86,3.55,8.52,3.18s4.42-4.61,7-5.35,6.79,1.78,9.22.68,2.56-5.59,4.77-7.02c2.22-1.43,7.07-.17,9-1.89,1.93-1.72.48-6.01,2.1-7.98s6.66-2.08,7.9-4.25c1.23-2.15-1.74-5.25-.9-7.58-.85-2.33,2.13-5.43.9-7.58-1.25-2.17-6.3-2.29-7.9-4.25s-.16-6.26-2.1-7.98-6.78-.45-9-1.89-2.32-5.91-4.77-7.02-6.59,1.43-9.22.68S60.08.41,57.34.03s-5.74,3.18-8.52,3.18S42.96-.35,40.29.03s-4.42,4.61-7,5.35-6.79-1.78-9.22-.68-2.56,5.59-4.77,7.02-7.07.17-9,1.89-.48,6.01-2.1,7.98S1.55,23.66.3,25.84s1.74,5.25.9,7.58c.85,2.33-2.13,5.43-.9,7.58s6.3,2.29,7.9,4.25.16,6.26,2.1,7.98c1.93,1.72,6.78.45,9,1.89,2.21,1.43,2.32,5.91,4.77,7.02,2.43,1.1,6.59-1.43,9.22-.68,2.58.74,4.26,4.97,7,5.35s5.74-3.18,8.52-3.18Z" />
+    <g clip-path="url(#loaderPupilClip)">
+      <path id="loaderSpiral" class="spiral" />
+    </g>
+  </svg>
+</div>
+
+<div class="layout">
+
+<!-- COLUMN 1: logo / about / social -->
+<div class="col col-about">
+
+  <a class="logo-wrap" id="logoWrap" href="/" aria-label="All things — home">
+    <svg class="eye" viewBox="0 0 97.63 66.84" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <defs>
+        <clipPath id="pupilClip" clipPathUnits="userSpaceOnUse">
+          <circle cx="48.815" cy="33.42" r="22" />
+        </clipPath>
+      </defs>
+      <path class="eye-fill" d="M48.82,63.63c2.79,0,5.86,3.55,8.52,3.18s4.42-4.61,7-5.35,6.79,1.78,9.22.68,2.56-5.59,4.77-7.02c2.22-1.43,7.07-.17,9-1.89,1.93-1.72.48-6.01,2.1-7.98s6.66-2.08,7.9-4.25c1.23-2.15-1.74-5.25-.9-7.58-.85-2.33,2.13-5.43.9-7.58-1.25-2.17-6.3-2.29-7.9-4.25s-.16-6.26-2.1-7.98-6.78-.45-9-1.89-2.32-5.91-4.77-7.02-6.59,1.43-9.22.68S60.08.41,57.34.03s-5.74,3.18-8.52,3.18S42.96-.35,40.29.03s-4.42,4.61-7,5.35-6.79-1.78-9.22-.68-2.56,5.59-4.77,7.02-7.07.17-9,1.89-.48,6.01-2.1,7.98S1.55,23.66.3,25.84s1.74,5.25.9,7.58c.85,2.33-2.13,5.43-.9,7.58s6.3,2.29,7.9,4.25.16,6.26,2.1,7.98c1.93,1.72,6.78.45,9,1.89,2.21,1.43,2.32,5.91,4.77,7.02,2.43,1.1,6.59-1.43,9.22-.68,2.58.74,4.26,4.97,7,5.35s5.74-3.18,8.52-3.18Z" />
+      <g clip-path="url(#pupilClip)">
+        <path id="logoSpiral" class="spiral" />
+      </g>
+    </svg>
+  </a>
+
+  <p class="name"><a class="me name-link" href="https://contra.com/surrealthing" target="_blank" rel="noopener">Ajith Chandran<span class="me-photo" aria-hidden="true" style="background-image:url('https://cdn.dribbble.com/users/380263/avatars/normal/f638e1d2bbbeb15bcb2cbeb528303f80.jpg')"></span></a></p>
+
+  <p class="intro">
+    A human, doing human things.<br />
+    Mostly making art and design. Sometimes writing about it.
+  </p>
+
+  <p class="intro">
+    Building <a href="#">wereflect</a> for human connection.
+  </p>
+
+  <p class="intro">
+    <span class="me">I'm<span class="me-photo" aria-hidden="true" style="background-image:url('https://cdn.dribbble.com/users/380263/avatars/normal/f638e1d2bbbeb15bcb2cbeb528303f80.jpg')"></span></span> an independent designer, artist — looking for interesting projects in AI, design, branding and art direction.
+  </p>
+
+  <section class="interests">
+    <h2>interesting finds</h2>
+    <div class="icons">
+      <a class="icon" href="https://pentagram.com" target="_blank" rel="noopener" aria-label="Pentagram"
+         data-preview="https://image.thum.io/get/width/520/https://pentagram.com" data-cap="pentagram.com">
+        <img src="https://www.google.com/s2/favicons?sz=32&domain=pentagram.com" alt="" />
+      </a>
+      <a class="icon" href="https://www.itsnicethat.com" target="_blank" rel="noopener" aria-label="It's Nice That"
+         data-preview="https://image.thum.io/get/width/520/https://www.itsnicethat.com" data-cap="itsnicethat.com">
+        <img src="https://www.google.com/s2/favicons?sz=32&domain=itsnicethat.com" alt="" />
+      </a>
+      <a class="icon" href="https://www.cosmos.so" target="_blank" rel="noopener" aria-label="Cosmos"
+         data-preview="https://image.thum.io/get/width/520/https://www.cosmos.so" data-cap="cosmos.so">
+        <img src="https://www.google.com/s2/favicons?sz=32&domain=cosmos.so" alt="" />
+      </a>
+      <a class="icon" href="https://lummi.ai" target="_blank" rel="noopener" aria-label="Lummi"
+         data-preview="https://image.thum.io/get/width/520/https://lummi.ai" data-cap="lummi.ai">
+        <img src="https://www.google.com/s2/favicons?sz=32&domain=lummi.ai" alt="" />
+      </a>
+    </div>
+  </section>
+
+  <section class="elsewhere">
+    <h2>elsewhere</h2>
+    <ul>
+      <li><a href="https://dribbble.com/4jith" target="_blank" rel="noopener">dribbble.com/4jith</a></li>
+      <li><a href="https://contra.com/surrealthing" target="_blank" rel="noopener">contra.com/surrealthing</a></li>
+      <li><a href="https://www.instagram.com/surreally.ai/" target="_blank" rel="noopener">instagram.com/surreally.ai</a></li>
+      <li><a href="https://x.com/4jith" target="_blank" rel="noopener">x.com/4jith</a></li>
+      <li><a href="https://www.lummi.ai/creator/4jith" target="_blank" rel="noopener">lummi.ai/creator/4jith</a></li>
+    </ul>
+  </section>
+
+</div><!-- /.col-about -->
+
+<!-- COLUMN 2: recent works -->
+<div class="col col-recent">
+
+  <div class="img-stack">
+
+    <a class="img-card" href="entries/conscious-cards.html">
+      <div class="img-frame ar-4-3" data-label="01 — conscious cards" style="background-image:url('https://media.contra.com/image/upload/w_1100,q_auto/apzvcyzhhyisczeena5d.avif')"></div>
+      <div class="img-cap">conscious cards · project</div>
+    </a>
+
+    <a class="img-card" href="https://www.lummi.ai/creator/4jith" target="_blank" rel="noopener">
+      <div class="img-frame ar-3-4" data-label="02 — lummi" style="background-image:url('https://media.contra.com/image/upload/w_1100,q_auto/inpsqdyblzxthrbcskuf.avif')"></div>
+      <div class="img-cap">ethereal portraits · experiment</div>
+    </a>
+
+    <a class="img-card" href="https://github.com/Surrealthing/beloong" target="_blank" rel="noopener">
+      <div class="img-frame ar-16-9" data-label="03 — beloong" style="background-image:url('https://media.contra.com/image/upload/w_1100,q_auto/l56wwkdvcwamiddpynq3.avif')"></div>
+      <div class="img-cap">beloong · project</div>
+    </a>
+
+    <a class="img-card" href="#">
+      <div class="img-frame ar-1-1" data-label="04 — we reflect" style="background-image:url('https://cdn.dribbble.com/userupload/25397945/file/original-b36701178ab8425ccfa6005909d13bb9.png')"></div>
+      <div class="img-cap">we reflect · identity</div>
+    </a>
+
+    <a class="img-card" href="https://www.instagram.com/surreally.ai/" target="_blank" rel="noopener">
+      <div class="img-frame ar-4-3" data-label="05 — surreally" style="background-image:url('https://media.contra.com/image/upload/w_1100,q_auto/tb4trvg5yzolo6txe2g7.avif')"></div>
+      <div class="img-cap">surreally · ai feed</div>
+    </a>
+
+    <a class="img-card" href="#">
+      <div class="img-frame ar-3-4" data-label="06 — sparkling" style="background-image:url('https://cdn.dribbble.com/userupload/16328392/file/original-89f6591f2e6436c0c05aa6addc02ff89.png')"></div>
+      <div class="img-cap">sparkling mindz · website</div>
+    </a>
+
+    <a class="img-card" href="https://contra.com/surrealthing" target="_blank" rel="noopener">
+      <div class="img-frame ar-16-9" data-label="07 — supercharge life ai" style="background-image:url('https://media.contra.com/image/upload/w_1100,q_auto/pwblhrxssrvuixocijs3.avif')"></div>
+      <div class="img-cap">supercharge life ai · landing</div>
+    </a>
+
+    <a class="img-card" href="https://dribbble.com/4jith" target="_blank" rel="noopener">
+      <div class="img-frame ar-1-1" data-label="08 — crossway" style="background-image:url('https://cdn.dribbble.com/userupload/25736884/file/still-112a02024f2fd2869ea65170835f423a.png')"></div>
+      <div class="img-cap">crossway · brand identity</div>
+    </a>
+
+    <a class="all-projects" href="projects.html">all projects →</a>
+
+  </div>
+
+</div><!-- /.col-recent -->
+
+<!-- COLUMN 3: projects / experiments / field notes -->
+<div class="col col-work">
+
+  <section>
+    <h2>projects</h2>
+    <ul>
+      <li><a href="entries/conscious-cards.html">conscious cards</a></li>
+      <li><a href="#">we reflect — identity</a></li>
+      <li><a href="#">sparkling mindz</a></li>
+      <li><a href="https://contra.com/surrealthing" target="_blank" rel="noopener">supercharge life ai</a></li>
+      <li><a href="https://dribbble.com/4jith" target="_blank" rel="noopener">crossway</a></li>
+      <li><a href="https://github.com/Surrealthing/beloong" target="_blank" rel="noopener">beloong</a></li>
+      <li class="view-all"><a href="projects.html">view all →</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>experiments</h2>
+    <ul>
+      <li><a href="https://www.lummi.ai/creator/4jith" target="_blank" rel="noopener">lummi — ethereal portraits</a></li>
+      <li><a href="https://www.instagram.com/surreally.ai/" target="_blank" rel="noopener">surreally — instagram</a></li>
+      <li><span class="loading">flora studies, loading_</span></li>
+      <li><span class="loading">midjourney series, loading_</span></li>
+      <li class="view-all"><a href="experiments.html">view all →</a></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>field notes</h2>
+    <ul>
+      <li><a href="https://surrealthings.substack.com/" target="_blank" rel="noopener">blog — journey of a lifetime, substack</a></li>
+      <li><span class="loading">photo journal, loading_</span></li>
+      <li class="view-all"><a href="field-notes.html">view all →</a></li>
+    </ul>
+  </section>
+
+</div><!-- /.col-work -->
+
+</div><!-- /.layout -->
+
+<a class="lets-talk" href="mailto:ajithchandran4@gmail.com">Let's talk →</a>
+
+<div class="preview-pop" id="previewPop" aria-hidden="true">
+  <div class="preview-img" id="previewImg"></div>
+  <div class="preview-cap" id="previewCap"></div>
+</div>
+
+<div class="liquid-cursor" id="liquidCursor" aria-hidden="true"></div>
+
+<!-- powerglitch — applied to the loader eye -->
+<script src="https://unpkg.com/powerglitch@latest/dist/powerglitch.min.js"></script>
+<script>
+  // ---- LOADER: glitch the eye, then remove after the reveal animation ----
+  (function () {
+    const loader = document.getElementById('loader');
+    if (!loader) return;
+
+    if (typeof window.PowerGlitch !== 'undefined') {
+      try {
+        window.PowerGlitch.glitch('.loader-eye', {
+          playMode: 'always',          // glitch continuously while loader is visible
+          createContainers: true,
+          hideOverflow: false,
+          timing: { duration: 1600, iterations: Infinity },
+          glitchTimeSpan: { start: 0, end: 1 },
+          shake: { velocity: 18, amplitudeX: 0.06, amplitudeY: 0.06 },
+          slice: { count: 6, velocity: 18, minHeight: 0.02, maxHeight: 0.15, hueRotate: true },
+          pulse: false,
+        });
+      } catch (e) { console.warn('[powerglitch] failed:', e); }
+    }
+
+    // No reveal transition — loader just disappears after a fixed glitch window.
+    setTimeout(() => loader.classList.add('is-gone'), 1200);
+  })();
+
+  // ---- LOGO: rotating spiral inside the eye + click burst ----
+
+  // Archimedean barber-pole spiral as a filled ribbon (inside the pupil clip).
+  // Starts at r=0, extends past the pupil edge → no visible inner/outer end.
+  function spiralRibbon(cx, cy, step, armWidth, turns, samplesPerTurn = 240) {
+    const samples = turns * samplesPerTurn;
+    const tMax = turns * Math.PI * 2;
+    const k = step / (Math.PI * 2);
+    const outer = [];
+    const inner = [];
+    for (let i = 0; i <= samples; i++) {
+      const t = (i / samples) * tMax;
+      const r = k * t;
+      const cos = Math.cos(t), sin = Math.sin(t);
+      outer.push([cx + r * cos, cy + r * sin]);
+      const ri = Math.max(0, r - armWidth);
+      inner.push([cx + ri * cos, cy + ri * sin]);
+    }
+    if (outer.length < 2) return '';
+    let d = 'M' + outer[0][0].toFixed(3) + ',' + outer[0][1].toFixed(3);
+    for (let i = 1; i < outer.length; i++) {
+      d += 'L' + outer[i][0].toFixed(3) + ',' + outer[i][1].toFixed(3);
+    }
+    for (let i = inner.length - 1; i >= 0; i--) {
+      d += 'L' + inner[i][0].toFixed(3) + ',' + inner[i][1].toFixed(3);
+    }
+    d += 'Z';
+    return d;
+  }
+  document.getElementById('logoSpiral')
+    .setAttribute('d', spiralRibbon(48.815, 33.42, 5.4, 2.7, 5));
+  // Same spiral for the loader eye
+  const loaderSpiralEl = document.getElementById('loaderSpiral');
+  if (loaderSpiralEl) {
+    loaderSpiralEl.setAttribute('d', spiralRibbon(48.815, 33.42, 5.4, 2.7, 5));
+  }
+
+  // Click handler: glitch the eye + toggle theme + play a light glitch sound.
+  (function () {
+    const logo = document.getElementById('logoWrap');
+    const body = document.body;
+    let resetTimer = null;
+
+    // Restore theme preference on load.
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark');
+    }
+
+    // Singleton AudioContext (lazy-init on first user gesture).
+    let _audioCtx = null;
+    function getAudioCtx() {
+      if (!_audioCtx) {
+        const C = window.AudioContext || window.webkitAudioContext;
+        if (!C) return null;
+        _audioCtx = new C();
+      }
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      return _audioCtx;
+    }
+
+    // Small glitch — brief noise tear + one square blip. ~90ms total.
+    function playGlitch() {
+      const ctx = getAudioCtx();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      const master = ctx.createGain();
+      master.gain.value = 0.18;
+      master.connect(ctx.destination);
+
+      // Tight bandpass keeps the whole thing small.
+      const bp = ctx.createBiquadFilter();
+      bp.type = 'bandpass';
+      bp.frequency.value = 2000;
+      bp.Q.value = 5;
+      bp.connect(master);
+
+      // 1) Brief noise tear (~30ms)
+      const nDur = 0.03;
+      const nBuf = ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate * nDur)), ctx.sampleRate);
+      const nData = nBuf.getChannelData(0);
+      for (let i = 0; i < nData.length; i++) nData[i] = (Math.random() * 2 - 1) * 0.5;
+      const noise = ctx.createBufferSource();
+      noise.buffer = nBuf;
+      const nGain = ctx.createGain();
+      nGain.gain.setValueAtTime(0.0001, now);
+      nGain.gain.exponentialRampToValueAtTime(0.45, now + 0.003);
+      nGain.gain.exponentialRampToValueAtTime(0.001, now + nDur);
+      noise.connect(nGain);
+      nGain.connect(bp);
+      noise.start(now);
+      noise.stop(now + nDur);
+
+      // 2) One quick square-wave blip (~50ms)
+      const osc = ctx.createOscillator();
+      osc.type = 'square';
+      osc.frequency.value = 1800;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.25, now + 0.024);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      osc.connect(g);
+      g.connect(bp);
+      osc.start(now + 0.02);
+      osc.stop(now + 0.1);
+    }
+
+    logo.addEventListener('click', (e) => {
+      e.preventDefault();          // never navigate; eye becomes the theme toggle
+
+      // Toggle theme
+      body.classList.toggle('dark');
+      localStorage.setItem('theme', body.classList.contains('dark') ? 'dark' : 'light');
+
+      // Trigger one-shot glitch (restart cleanly) — same chromatic look as loader
+      logo.classList.remove('glitching');
+      void logo.offsetWidth;
+      logo.classList.add('glitching');
+      clearTimeout(resetTimer);
+      resetTimer = setTimeout(() => logo.classList.remove('glitching'), 1450);
+    });
+  })();
+
+
+  // ---- Scroll-velocity distortion on the recent works column ----
+  // Tracks scroll speed, sets CSS vars --skew and --squash on the column.
+  // Cards inherit those vars and skew/scale during fast scroll, decay on stop.
+  (function () {
+    const col = document.querySelector('.col-recent');
+    if (!col) return;
+
+    const SKEW_MAX = 9;        // degrees at peak velocity
+    const SQUASH_MAX = 0.06;   // 1 - 0.94 squash at peak
+    const VELO_DIVISOR = 2.2;  // tuning: lower = more sensitive
+    const DECAY = 0.93;        // per-frame decay (closer to 1 = smoother trail-off)
+
+    let lastTop = col.scrollTop;
+    let lastTime = performance.now();
+    let skew = 0;
+    let rafId = null;
+
+    function setVars() {
+      col.style.setProperty('--skew', skew.toFixed(2) + 'deg');
+      const squashAmt = Math.min(SQUASH_MAX, Math.abs(skew) * 0.006);
+      col.style.setProperty('--squash', (1 - squashAmt).toFixed(3));
+    }
+
+    function decay() {
+      skew *= DECAY;
+      if (Math.abs(skew) < 0.05) {
+        skew = 0;
+        col.style.setProperty('--skew', '0deg');
+        col.style.setProperty('--squash', '1');
+        rafId = null;
+        return;
+      }
+      setVars();
+      rafId = requestAnimationFrame(decay);
+    }
+
+    col.addEventListener('scroll', () => {
+      const now = performance.now();
+      const dt = now - lastTime;
+      if (dt > 0) {
+        const dy = col.scrollTop - lastTop;
+        const v = dy / dt;        // px / ms (positive = scrolling down)
+        const target = Math.max(-SKEW_MAX, Math.min(SKEW_MAX, v * VELO_DIVISOR));
+        // smooth toward target rather than hard set — feels less twitchy
+        skew = skew * 0.5 + target * 0.5;
+        setVars();
+      }
+      lastTop = col.scrollTop;
+      lastTime = now;
+
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = requestAnimationFrame(decay);
+    }, { passive: true });
+  })();
+
+  // ---- Icon hover preview popup ----
+  (function () {
+    const pop = document.getElementById('previewPop');
+    const img = document.getElementById('previewImg');
+    const cap = document.getElementById('previewCap');
+    if (!pop || !img || !cap) return;
+
+    const PW  = 220;
+    const PH  = 166;          // image (138) + caption (~28)
+    const GAP = 12;
+
+    function show(icon) {
+      const rect = icon.getBoundingClientRect();
+      const previewSrc = icon.dataset.preview;
+      const capText    = icon.dataset.cap || '';
+
+      img.style.backgroundImage = previewSrc ? `url('${previewSrc}')` : 'none';
+      cap.textContent = capText;
+
+      let left = rect.left;
+      let top  = rect.top - PH - GAP;
+      if (left + PW > window.innerWidth - 12) left = rect.right - PW;
+      if (left < 12) left = 12;
+      if (top < 12)  top  = rect.bottom + GAP;
+
+      pop.style.left = left + 'px';
+      pop.style.top  = top  + 'px';
+      pop.classList.add('is-show');
+    }
+    function hide() { pop.classList.remove('is-show'); }
+
+    document.querySelectorAll('.icon').forEach((icon) => {
+      icon.addEventListener('mouseenter', () => show(icon));
+      icon.addEventListener('mouseleave', hide);
+      icon.addEventListener('focus',     () => show(icon));
+      icon.addEventListener('blur',      hide);
+    });
+  })();
+
+  // ---- Stroke-circle cursor with jelly (spring) physics ----
+  (function () {
+    const cursor = document.getElementById('liquidCursor');
+    if (!cursor) return;
+
+    let mx = window.innerWidth / 2;
+    let my = window.innerHeight / 2;
+    let cx = mx, cy = my;
+    let vx = 0, vy = 0;
+    let curStretch = 1, curAngle = 0;
+    let active = false;
+
+    // Plain lerp follow + subtle squash. No spring — no overshoot or bounce.
+    const FOLLOW_K_BASE = 0.32;   // baseline snappiness
+    const FOLLOW_K_NEAR = 0.95;   // very snappy when near the logo
+    const PROX_RADIUS   = 300;    // px — wider zone so it kicks in earlier
+    const STRETCH_K = 0.014;      // mild jelly squash
+    const STRETCH_MAX = 0.22;     // cap so it never feels rubbery
+    const SETTLE_K  = 0.24;       // catch up stretch/angle a bit faster too
+
+    // Track logo center for proximity-based follow speed.
+    const logoEl = document.getElementById('logoWrap');
+    const spiralEl = document.getElementById('logoSpiral');
+    let logoCx = 0, logoCy = 0;
+    function updateLogoCenter() {
+      if (!logoEl) return;
+      const r = logoEl.getBoundingClientRect();
+      logoCx = r.left + r.width / 2;
+      logoCy = r.top + r.height / 2;
+    }
+    updateLogoCenter();
+    window.addEventListener('resize', updateLogoCenter);
+    window.addEventListener('scroll', updateLogoCenter, { passive: true, capture: true });
+
+    // Spiral rotation state (JS-driven so we can scale speed with proximity).
+    let spiralAngle = 0;
+    let spiralSpeed = 0.5;          // current degrees-per-frame
+    const SPIN_BASE = 0.5;          // 30 °/s ≈ 12 s/turn (matches old CSS speed)
+    const SPIN_NEAR = 2.0;          // 120 °/s ≈ 3 s/turn at full proximity
+
+    window.addEventListener('mousemove', (e) => {
+      mx = e.clientX;
+      my = e.clientY;
+      if (!active) {
+        active = true;
+        cursor.classList.add('is-active');
+      }
+    }, { passive: true });
+
+    window.addEventListener('mouseleave', () => {
+      active = false;
+      cursor.classList.remove('is-active');
+    });
+
+    function tick() {
+      // Boost follow speed as cursor approaches the eye logo.
+      // Eased curve (squared) so the boost is subtle far away and dramatic close in.
+      const ddx = mx - logoCx, ddy = my - logoCy;
+      const distToLogo = Math.hypot(ddx, ddy);
+      const linear = Math.max(0, 1 - distToLogo / PROX_RADIUS);
+      const proximity = linear * linear;                              // 0..1, eased
+      const followK = FOLLOW_K_BASE + (FOLLOW_K_NEAR - FOLLOW_K_BASE) * proximity;
+
+      // Spiral spin speed scales with the same proximity. CCW (negative).
+      if (spiralEl) {
+        const targetSpeed = SPIN_BASE + (SPIN_NEAR - SPIN_BASE) * proximity;
+        spiralSpeed += (targetSpeed - spiralSpeed) * 0.12;            // smooth chase
+        spiralAngle -= spiralSpeed;
+        spiralEl.style.transform = 'rotate(' + spiralAngle.toFixed(2) + 'deg)';
+      }
+
+      // Plain lerp — direct, no spring overshoot.
+      vx = (mx - cx) * followK;
+      vy = (my - cy) * followK;
+      cx += vx;
+      cy += vy;
+
+      const speed = Math.hypot(vx, vy);
+
+      // Jelly squash-stretch from velocity.
+      const targetStretch = 1 + Math.min(speed * STRETCH_K, STRETCH_MAX);
+      let targetAngle = curAngle;
+      if (speed > 0.4) {
+        targetAngle = Math.atan2(vy, vx) * 180 / Math.PI;
+      }
+
+      curStretch += (targetStretch - curStretch) * SETTLE_K;
+
+      let dA = targetAngle - curAngle;
+      if (dA > 180) dA -= 360;
+      if (dA < -180) dA += 360;
+      curAngle += dA * SETTLE_K;
+
+      const counter = 1 / Math.sqrt(curStretch);
+      cursor.style.transform =
+        `translate3d(${cx}px, ${cy}px, 0) rotate(${curAngle}deg) scale(${curStretch}, ${counter})`;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    // Hover scale up over interactive elements.
+    const interactives = 'a, button, .logo-wrap, .img-card, .me';
+    document.querySelectorAll(interactives).forEach((el) => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
+    });
+  })();
+</script>
+
+</body>
+</html>

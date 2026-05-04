@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content="Conscious Cards — 96 questions, 6 emotions. A specimen entry on Surreal things." />
+<title>NGC 010 · Conscious Cards — Surreal things</title>
+<link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
+<style>
+  :root {
+    --bg: #03060d;
+    --fg: #f2f3f5;
+    --meta: #5a6478;
+    --faint: #141a26;
+    --line: #1a2030;
+    --accent: #4d7cff;
+
+    --mono: "ff-attribute-mono", "JetBrains Mono", "Geist Mono", ui-monospace, monospace;
+    --grotesk: "neuzeit-grotesk", "Inter", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    transition: filter 0.4s ease;
+  }
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 80% -10%, rgba(77, 124, 255, 0.06), transparent 60%),
+      radial-gradient(ellipse 60% 40% at -10% 100%, rgba(77, 124, 255, 0.04), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+  #starfield {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  #starfield .star {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    background: #fff;
+    border-radius: 50%;
+  }
+
+  main, header, footer { position: relative; z-index: 1; }
+
+  /* ---- HEADER ---- */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 40px;
+    border-bottom: 1px solid var(--line);
+  }
+  .mast { display: flex; align-items: baseline; gap: 14px; }
+  .mast-name {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--fg);
+  }
+  .mast-sep { color: var(--meta); font-size: 13px; }
+  .mast-tag {
+    color: var(--meta);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: lowercase;
+  }
+  .spectrum { display: flex; gap: 8px; align-items: center; }
+  .spectrum-label {
+    color: var(--meta);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+  .spectrum button {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--meta);
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .spectrum button:hover { color: var(--fg); border-color: var(--meta); }
+  .spectrum button.active {
+    color: var(--bg);
+    background: var(--fg);
+    border-color: var(--fg);
+  }
+
+  /* ---- BREADCRUMB ---- */
+  .crumb {
+    padding: 32px 40px 0;
+  }
+  .crumb a {
+    color: var(--meta);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    transition: color 0.15s;
+  }
+  .crumb a:hover { color: var(--fg); }
+
+  /* ---- ENTRY HEAD ---- */
+  .entry-head {
+    padding: 40px 40px 56px;
+    border-bottom: 1px solid var(--line);
+  }
+  .entry-num-big {
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    color: var(--meta);
+    margin-bottom: 16px;
+  }
+  .entry-title-big {
+    font-family: var(--mono);
+    font-size: clamp(36px, 5.5vw, 72px);
+    line-height: 1.0;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin-bottom: 32px;
+  }
+  .entry-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--meta);
+  }
+  .entry-meta span strong {
+    display: block;
+    color: var(--fg);
+    font-weight: normal;
+    margin-top: 4px;
+  }
+
+  /* ---- HERO IMAGE ---- */
+  .hero-media {
+    margin: 0 40px;
+    aspect-ratio: 16 / 9;
+    background: var(--faint);
+    border: 1px solid var(--line);
+    margin-top: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--meta);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* ---- BODY ---- */
+  .entry-body {
+    padding: 64px 40px;
+    max-width: 720px;
+  }
+  .entry-body p {
+    font-family: var(--grotesk);
+    font-size: 17px;
+    line-height: 1.65;
+    margin-bottom: 1.4em;
+    color: var(--fg);
+  }
+  .entry-body p:first-child::first-line {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--meta);
+  }
+  .entry-body h3 {
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--meta);
+    margin: 48px 0 16px;
+  }
+
+  .entry-body .pull {
+    font-family: var(--mono);
+    font-size: 22px;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    color: var(--fg);
+    border-left: 1px solid var(--line);
+    padding-left: 24px;
+    margin: 32px 0;
+  }
+
+  /* ---- INLINE MEDIA ---- */
+  .inline-media {
+    margin: 32px 0;
+    aspect-ratio: 4 / 3;
+    background: var(--faint);
+    border: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--meta);
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .inline-caption {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--meta);
+    margin-top: -16px;
+    margin-bottom: 32px;
+  }
+
+  /* ---- LINKS ---- */
+  .entry-links {
+    padding: 0 40px 64px;
+    max-width: 720px;
+  }
+  .entry-links-title {
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--meta);
+    margin-bottom: 16px;
+  }
+  .entry-links ul { list-style: none; border-top: 1px solid var(--line); }
+  .entry-links li { border-bottom: 1px solid var(--line); }
+  .entry-links a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    color: var(--fg);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.15s, padding 0.15s;
+  }
+  .entry-links a:hover { color: var(--accent); padding-left: 8px; }
+  .entry-links a span:last-child { color: var(--meta); font-size: 12px; }
+
+  /* ---- NAV PREV/NEXT ---- */
+  .entry-nav {
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+  .entry-nav a {
+    padding: 28px 40px;
+    color: var(--fg);
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+  .entry-nav a:hover { background: var(--faint); }
+  .entry-nav .nav-label {
+    display: block;
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--meta);
+    margin-bottom: 8px;
+  }
+  .entry-nav .nav-title {
+    font-size: 14px;
+    letter-spacing: 0.02em;
+  }
+  .entry-nav a:nth-child(2) { text-align: right; border-left: 1px solid var(--line); }
+
+  /* ---- FOOTER ---- */
+  footer {
+    padding: 32px 40px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--meta);
+    text-transform: uppercase;
+  }
+
+  /* ---- MOBILE ---- */
+  @media (max-width: 720px) {
+    header { padding: 18px 20px; flex-wrap: wrap; gap: 14px; }
+    .mast { gap: 8px; }
+    .mast-tag { display: none; }
+    .spectrum-label { display: none; }
+    .spectrum button { padding: 5px 8px; font-size: 10px; }
+
+    .crumb { padding: 24px 20px 0; }
+    .entry-head { padding: 24px 20px 32px; }
+    .entry-title-big { font-size: 36px; line-height: 1.05; }
+    .entry-meta { gap: 20px; }
+
+    .hero-media { margin: 32px 20px 0; }
+    .entry-body { padding: 40px 20px; }
+    .entry-body p { font-size: 16px; }
+    .entry-body .pull { font-size: 18px; padding-left: 16px; }
+    .entry-links { padding: 0 20px 48px; }
+
+    .entry-nav { grid-template-columns: 1fr; }
+    .entry-nav a:nth-child(2) {
+      text-align: left;
+      border-left: none;
+      border-top: 1px solid var(--line);
+    }
+    .entry-nav a { padding: 20px; }
+
+    footer { padding: 24px 20px; flex-direction: column; gap: 8px; }
+  }
+
+  body.spectrum-mono { filter: grayscale(1); }
+  body.spectrum-negative { filter: invert(1) hue-rotate(180deg); }
+  body.spectrum-negative #starfield .star { background: #000; }
+</style>
+</head>
+<body>
+
+<div id="starfield"></div>
+
+<header>
+  <div class="mast">
+    <a class="mast-name" href="../index.html">Surreal things</a>
+    <span class="mast-sep">/</span>
+    <span class="mast-tag">all things design</span>
+  </div>
+  <div class="spectrum" role="group" aria-label="Display spectrum">
+    <span class="spectrum-label">Spectrum</span>
+    <button data-mode="default" class="active" aria-pressed="true">Default</button>
+    <button data-mode="mono" aria-pressed="false">Mono</button>
+    <button data-mode="negative" aria-pressed="false">Negative</button>
+  </div>
+</header>
+
+<main>
+
+  <div class="crumb">
+    <a href="../index.html">← Index</a>
+  </div>
+
+  <section class="entry-head">
+    <div class="entry-num-big">NGC 010 · Specimen</div>
+    <h1 class="entry-title-big">Conscious Cards</h1>
+    <div class="entry-meta">
+      <span>Date <strong>APR 2026 / 18:24</strong></span>
+      <span>Medium <strong>Card deck · Brand · Product</strong></span>
+      <span>For <strong>We Reflect</strong></span>
+      <span>Role <strong>Co-design, brand</strong></span>
+    </div>
+  </section>
+
+  <div class="hero-media">[ image placeholder · 16:9 ]</div>
+
+  <article class="entry-body">
+
+    <p>96 questions, 6 emotions. Conscious Cards is a deck designed to help two people make space for the conversation they would otherwise avoid. The questions are not icebreakers; they are the kind of question that, asked at the right moment, lets someone become more honest with themselves.</p>
+
+    <p>The brief was simple to say and difficult to do: a card deck that does not feel like a wellness product, a self-help product, or a party game — and yet sits comfortably between all three.</p>
+
+    <div class="pull">
+      The card is not the experience. The card is the permission slip.
+    </div>
+
+    <h3>Approach</h3>
+    <p>Each card is one question. The card has no instructions, no prompts, no scoring, no app. The packaging is the entire interface — choose a card, ask the question, listen.</p>
+
+    <p>Six emotions organize the deck — not as categories the user picks from, but as a scaffold the writer of each question worked within. The reader never sees them; they're the structure under the surface.</p>
+
+    <div class="inline-media">[ image placeholder · 4:3 ]</div>
+    <p class="inline-caption">Fig. 01 — deck open, six suits visible</p>
+
+    <h3>What's in the box</h3>
+    <p>96 questions, printed on uncoated card stock. A small instruction card that you only need once. A box that closes with the satisfying sound of two pieces of card finding each other.</p>
+
+  </article>
+
+  <section class="entry-links">
+    <div class="entry-links-title">Links</div>
+    <ul>
+      <li><a href="#" target="_blank" rel="noopener"><span>We Reflect — product page</span><span>↗</span></a></li>
+      <li><a href="#" target="_blank" rel="noopener"><span>Buy the deck</span><span>↗</span></a></li>
+      <li><a href="https://dribbble.com/4jith" target="_blank" rel="noopener"><span>Process shots — Dribbble</span><span>↗</span></a></li>
+    </ul>
+  </section>
+
+  <nav class="entry-nav">
+    <a href="#">
+      <span class="nav-label">← Previous · NGC 009</span>
+      <span class="nav-title">Beloong</span>
+    </a>
+    <a href="#">
+      <span class="nav-label">Next · NGC 011 →</span>
+      <span class="nav-title">—</span>
+    </a>
+  </nav>
+
+</main>
+
+<footer>
+  <span>© 2026 — Ajith Chandran</span>
+  <span>12.97°N / 77.59°E</span>
+</footer>
+
+<script>
+  // ---- Starfield ----
+  (function () {
+    const layer = document.getElementById('starfield');
+    const count = window.innerWidth < 720 ? 50 : 110;
+    const frag = document.createDocumentFragment();
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      const op = (Math.random() * 0.5 + 0.1).toFixed(2);
+      s.style.opacity = op;
+      const size = Math.random() < 0.1 ? 2 : 1;
+      s.style.width = size + 'px';
+      s.style.height = size + 'px';
+      frag.appendChild(s);
+    }
+    layer.appendChild(frag);
+  })();
+
+  // ---- Spectrum ----
+  (function () {
+    const buttons = document.querySelectorAll('.spectrum button');
+    const body = document.body;
+    const stored = localStorage.getItem('spectrum') || 'default';
+    apply(stored);
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        apply(btn.dataset.mode);
+        localStorage.setItem('spectrum', btn.dataset.mode);
+      });
+    });
+    function apply(mode) {
+      body.classList.remove('spectrum-mono', 'spectrum-negative');
+      if (mode === 'mono') body.classList.add('spectrum-mono');
+      if (mode === 'negative') body.classList.add('spectrum-negative');
+      buttons.forEach(b => {
+        const active = b.dataset.mode === mode;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+    }
+  })();
+</script>
+
+</body>
+</html>
