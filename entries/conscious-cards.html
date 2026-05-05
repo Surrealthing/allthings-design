@@ -3,8 +3,22 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark light" />
+<style>
+  /* Default to system color scheme so the browser paints the correct bg
+     during navigation, BEFORE our script runs. */
+  html { background: #fbfbfb; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0e0e0e; color-scheme: dark; }
+  }
+  /* Explicit user choice (set by inline script below) wins. */
+  html.theme-light { background: #fbfbfb; color-scheme: light; }
+  html.theme-dark  { background: #0e0e0e; color-scheme: dark; }
+  html.theme-dark body { background: #0e0e0e; color: #f4f4f4; }
+</style>
+<script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='dark'){r.classList.add('dark','theme-dark');}else if(t==='light'){r.classList.add('theme-light');}}catch(e){}})();</script>
 <meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
-<script>(function(){if(localStorage.getItem('theme')==='dark'){document.getElementById('themeColorMeta').setAttribute('content','#0e0e0e');}})();</script>
+<script>(function(){try{if(localStorage.getItem('theme')==='dark'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#0e0e0e');}}catch(e){}})();</script>
 <meta name="description" content="conscious cards — 96 questions, 6 emotions. a project by ajith chandran for we reflect." />
 <title>conscious cards · ajith chandran</title>
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
@@ -23,7 +37,7 @@
     --mono: "ff-attribute-mono", "JetBrains Mono", "Geist Mono", ui-monospace, monospace;
     --grotesk: "neuzeit-grotesk", "Inter", system-ui, sans-serif;
   }
-  body.dark {
+  html.dark, body.dark {
     --bg: #0e0e0e;
     --fg: #f4f4f4;
     --label: #fff;
@@ -46,9 +60,11 @@
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    transition: background 0.4s ease, color 0.4s ease;
     overscroll-behavior: none;
   }
+  /* Only animate background/color AFTER the page is ready, so initial
+     render doesn't fade from light to dark on dark-theme refresh. */
+  body.is-ready { transition: background 0.4s ease, color 0.4s ease; }
   html, body { height: 100vh; overflow: hidden; }
   a { color: inherit; }
 
@@ -102,21 +118,22 @@
     z-index: 100;
     display: inline-flex;
     align-items: center;
-    gap: 16px;
-    padding: 14px 20px;
+    gap: 12px;
+    padding: 9px 14px;
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 0.02em;
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
   .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .lets-talk .arrow { font-size: 15px; transition: transform 0.2s ease; }
+  .lets-talk .arrow { font-size: 13px; transition: transform 0.2s ease; }
   .lets-talk:hover .arrow { transform: translate(2px, -2px); }
   @media (max-width: 720px) {
-    .lets-talk { top: 20px; right: 20px; padding: 10px 14px; font-size: 12px; gap: 12px; }
+    .lets-talk { top: 20px; right: 20px; padding: 7px 11px; font-size: 11px; gap: 10px; }
+    .lets-talk .arrow { font-size: 12px; }
   }
 
   .logo-wrap {
@@ -631,16 +648,18 @@
     .lightbox.is-open .lightbox-img { max-height: calc(100vw - 80px); }
     .lightbox.is-open .lightbox-meta { font-size: 11px; }
 
+    /* both close and back on screenshot RIGHT edge (= pre-rot TOP edge):
+       close at pre-rot top-left  → screenshot top-right
+       back  at pre-rot top-right → screenshot bottom-right
+       arrows: prev on pre-rot LEFT  → screenshot TOP    (← rotates CW to ↑)
+               next on pre-rot RIGHT → screenshot BOTTOM (→ rotates CW to ↓) */
     .lightbox.is-open .lightbox-back {
-      top: auto; left: auto;
-      right: 24px; bottom: 24px;
+      bottom: auto; right: auto;
+      left: 24px; top: 24px;
       z-index: 5;
     }
-    .lightbox.is-open .lightbox-close {
-      top: auto; right: auto;
-      left: 24px; bottom: 24px;
-      z-index: 5;
-    }
+    /* close hidden in rotated portrait — back is enough */
+    .lightbox.is-open .lightbox-close { display: none; }
     .lightbox.is-open .lightbox-prev,
     .lightbox.is-open .lightbox-next {
       width: 44px;
@@ -649,8 +668,8 @@
       transform: translateY(-50%);
       z-index: 5;
     }
-    .lightbox.is-open .lightbox-prev { right: 24px; left: auto; }
-    .lightbox.is-open .lightbox-next { left: 24px; right: auto; }
+    .lightbox.is-open .lightbox-prev { left: 24px; right: auto; }
+    .lightbox.is-open .lightbox-next { right: 24px; left: auto; }
   }
 
   /* ---- MOBILE: revert to page scroll, gallery becomes horizontal carousel on top ---- */
@@ -716,21 +735,6 @@
 </style>
 </head>
 <body>
-
-<!-- LOADER -->
-<div class="loader" id="loader" aria-hidden="true">
-  <svg class="loader-eye" viewBox="0 0 97.63 66.84" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-    <defs>
-      <clipPath id="loaderPupilClip" clipPathUnits="userSpaceOnUse">
-        <circle cx="48.815" cy="33.42" r="22" />
-      </clipPath>
-    </defs>
-    <path class="eye-fill" d="M48.82,63.63c2.79,0,5.86,3.55,8.52,3.18s4.42-4.61,7-5.35,6.79,1.78,9.22.68,2.56-5.59,4.77-7.02c2.22-1.43,7.07-.17,9-1.89,1.93-1.72.48-6.01,2.1-7.98s6.66-2.08,7.9-4.25c1.23-2.15-1.74-5.25-.9-7.58-.85-2.33,2.13-5.43.9-7.58-1.25-2.17-6.3-2.29-7.9-4.25s-.16-6.26-2.1-7.98-6.78-.45-9-1.89-2.32-5.91-4.77-7.02-6.59,1.43-9.22.68S60.08.41,57.34.03s-5.74,3.18-8.52,3.18S42.96-.35,40.29.03s-4.42,4.61-7,5.35-6.79-1.78-9.22-.68-2.56,5.59-4.77,7.02-7.07.17-9,1.89-.48,6.01-2.1,7.98S1.55,23.66.3,25.84s1.74,5.25.9,7.58c.85,2.33-2.13,5.43-.9,7.58s6.3,2.29,7.9,4.25.16,6.26,2.1,7.98c1.93,1.72,6.78.45,9,1.89,2.21,1.43,2.32,5.91,4.77,7.02,2.43,1.1,6.59-1.43,9.22-.68,2.58.74,4.26,4.97,7,5.35s5.74-3.18,8.52-3.18Z" />
-    <g clip-path="url(#loaderPupilClip)">
-      <path id="loaderSpiral" class="spiral" />
-    </g>
-  </svg>
-</div>
 
 <header>
   <a class="logo-wrap" id="logoWrap" href="../index.html" aria-label="all things — home">
@@ -811,6 +815,30 @@
       <img class="img-frame" src="https://substackcdn.com/image/fetch/$s_!ELHR!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F2512aea0-0bb3-4b04-aa90-0b1c89ec62d8_2048x1365.jpeg" alt="process notes substack post hero" />
       <figcaption class="caption">process notes — substack</figcaption>
     </figure>
+    <figure>
+      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-1/1200/900" alt="placeholder" />
+      <figcaption class="caption">placeholder — texture study</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-2/1200/1500" alt="placeholder" />
+      <figcaption class="caption">placeholder — packaging close-up</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-3/1600/900" alt="placeholder" />
+      <figcaption class="caption">placeholder — deck spread</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-4/1200/1200" alt="placeholder" />
+      <figcaption class="caption">placeholder — single card</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-5/1400/900" alt="placeholder" />
+      <figcaption class="caption">placeholder — in-use shot</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-6/1200/1500" alt="placeholder" />
+      <figcaption class="caption">placeholder — detail crop</figcaption>
+    </figure>
   </section>
 
 </main>
@@ -882,44 +910,10 @@
     if (el) el.setAttribute('d', spiralRibbon(48.815, 33.42, 5.4, 2.7, 5));
   });
 
-  // ---- LOADER + REVEAL CHOREOGRAPHY ----
-  (function () {
-    const loader = document.getElementById('loader');
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (reduced) {
-      if (loader) loader.classList.add('is-gone');
-      document.querySelectorAll('.reveal-up, .gallery .img-frame')
-        .forEach(el => el.classList.add('is-in'));
-      return;
-    }
-
-    if (loader && typeof window.PowerGlitch !== 'undefined') {
-      try {
-        window.PowerGlitch.glitch('.loader-eye', {
-          playMode: 'always',
-          createContainers: true,
-          hideOverflow: false,
-          timing: { duration: 1400, iterations: Infinity },
-          glitchTimeSpan: { start: 0, end: 1 },
-          shake: { velocity: 16, amplitudeX: 0.05, amplitudeY: 0.05 },
-          slice: { count: 5, velocity: 16, minHeight: 0.02, maxHeight: 0.14, hueRotate: true },
-          pulse: false,
-        });
-      } catch (e) { /* graceful */ }
-    }
-
-    const LOADER_HOLD = 900;
-    setTimeout(() => {
-      if (loader) loader.classList.add('is-gone');
-
-      const ups = document.querySelectorAll('.reveal-up');
-      ups.forEach((el, i) => setTimeout(() => el.classList.add('is-in'), 120 + i * 110));
-
-      const frames = document.querySelectorAll('.gallery .img-frame');
-      frames.forEach((el, i) => setTimeout(() => el.classList.add('is-in'), 280 + i * 130));
-    }, LOADER_HOLD);
-  })();
+  // No loader on detail pages — show content immediately so refresh
+  // doesn't reveal a blank page while images load.
+  document.querySelectorAll('.reveal-up, .gallery .img-frame')
+    .forEach(el => el.classList.add('is-in'));
 
   // ---- LIGHTBOX: click image → fullscreen viewer with prev/next + rotate hint on phone ----
   (function () {
@@ -1077,6 +1071,10 @@
       if (e.metaKey || e.ctrlKey || e.shiftKey) return;
       e.preventDefault();
       const dark = document.body.classList.toggle('dark');
+      const r = document.documentElement;
+      r.classList.toggle('dark', dark);
+      r.classList.toggle('theme-dark', dark);
+      r.classList.toggle('theme-light', !dark);
       localStorage.setItem('theme', dark ? 'dark' : 'light');
       const tc = document.getElementById('themeColorMeta');
       if (tc) tc.setAttribute('content', dark ? '#0e0e0e' : '#fbfbfb');

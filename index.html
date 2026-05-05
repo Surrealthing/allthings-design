@@ -3,8 +3,19 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="dark light" />
+<style>
+  html { background: #fbfbfb; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    html { background: #0e0e0e; color-scheme: dark; }
+  }
+  html.theme-light { background: #fbfbfb; color-scheme: light; }
+  html.theme-dark  { background: #0e0e0e; color-scheme: dark; }
+  html.theme-dark body { background: #0e0e0e; color: #f4f4f4; }
+</style>
+<script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='dark'){r.classList.add('dark','theme-dark');}else if(t==='light'){r.classList.add('theme-light');}var seen=sessionStorage.getItem('at_visited')==='1';sessionStorage.setItem('at_visited','1');var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};if(!seen||nav.type!=='navigate'){r.classList.add('show-loader');}}catch(e){r.classList.add('show-loader');}})();</script>
 <meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
-<script>(function(){if(localStorage.getItem('theme')==='dark'){document.getElementById('themeColorMeta').setAttribute('content','#0e0e0e');}})();</script>
+<script>(function(){try{if(localStorage.getItem('theme')==='dark'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#0e0e0e');}}catch(e){}})();</script>
 <meta name="description" content="Ajith Chandran — designer working on brand, product and image-making out of Bangalore. All things design." />
 <title>Ajith Chandran — all things design</title>
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
@@ -25,7 +36,7 @@
   }
 
   /* Dark theme — toggled by clicking the eye logo. */
-  body.dark {
+  html.dark, body.dark {
     --bg: #0e0e0e;
     --fg: #f4f4f4;
     --label: #ffffff;
@@ -43,9 +54,9 @@
     fill: #c8c8c8;
   }
 
-  html, body {
-    transition: background-color 0.4s ease, color 0.4s ease;
-  }
+  /* Theme-toggle transition only kicks in after first paint, otherwise
+     dark-theme refresh shows a white→black animation. */
+  body.is-ready { transition: background-color 0.4s ease, color 0.4s ease; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -271,21 +282,22 @@
     z-index: 100;
     display: inline-flex;
     align-items: center;
-    gap: 16px;
-    padding: 14px 20px;
+    gap: 12px;
+    padding: 9px 14px;
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 0.02em;
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
   .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .lets-talk .arrow { font-size: 15px; transition: transform 0.2s ease; }
+  .lets-talk .arrow { font-size: 13px; transition: transform 0.2s ease; }
   .lets-talk:hover .arrow { transform: translate(2px, -2px); }
   @media (max-width: 720px) {
-    .lets-talk { top: 20px; right: 20px; padding: 10px 14px; font-size: 12px; gap: 12px; }
+    .lets-talk { top: 20px; right: 20px; padding: 7px 11px; font-size: 11px; gap: 10px; }
+    .lets-talk .arrow { font-size: 12px; }
   }
 
   /* Name caption — sits between logo and bio paragraphs. */
@@ -406,17 +418,20 @@
     }
   }
 
-  /* ---- LOADER: theme-aware. Light = black eye on white. Dark = white eye on black. ---- */
+  /* ---- LOADER: theme-aware. Light = black eye on white. Dark = white eye on black.
+     Hidden by default — only shown when html.show-loader is set by the inline
+     head script (first visit or hard refresh). */
   .loader {
     position: fixed;
     inset: 0;
-    background: #ffffff;          /* light theme default */
+    background: var(--bg);
     z-index: 10000;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
   }
-  .loader.is-gone { display: none; }
+  html.show-loader .loader { display: flex; }
+  .loader.is-gone { display: none !important; }
 
   .loader-eye {
     width: 110px;
@@ -434,10 +449,11 @@
     will-change: transform;
   }
 
-  /* Dark theme override — black bg, white eye, black spiral. */
-  body.dark .loader { background: #000000; }
-  body.dark .loader-eye { color: #ffffff; }
-  body.dark .loader-eye .spiral { fill: #000000; }
+  /* Dark theme override — black bg, white eye, black spiral.
+     Targets html.dark too so first paint (before body.dark is added) is correct. */
+  html.dark .loader, body.dark .loader { background: #000000; }
+  html.dark .loader-eye, body.dark .loader-eye { color: #ffffff; }
+  html.dark .loader-eye .spiral, body.dark .loader-eye .spiral { fill: #000000; }
 
   /* Animated red + blue chromatic split layered on top of PowerGlitch slices */
   @keyframes chroma {
@@ -450,6 +466,37 @@
 
   @media (prefers-reduced-motion: reduce) {
     .loader { display: none !important; }
+  }
+
+  /* Subtle entrance for homepage text + sidebar content. Body gets `is-ready`
+     after the loader is gone (or immediately if skipped). */
+  .col-about .name,
+  .col-about .intro,
+  .col-about .interests,
+  .col-about .elsewhere,
+  .col-work section {
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 720ms cubic-bezier(0.2, 0.8, 0.2, 1),
+                transform 720ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  body.is-ready .col-about .name        { opacity: 1; transform: none; transition-delay: 60ms; }
+  body.is-ready .col-about .intro       { opacity: 1; transform: none; }
+  body.is-ready .col-about .intro:nth-of-type(2) { transition-delay: 140ms; }
+  body.is-ready .col-about .intro:nth-of-type(3) { transition-delay: 220ms; }
+  body.is-ready .col-about .intro:nth-of-type(4) { transition-delay: 300ms; }
+  body.is-ready .col-about .interests   { opacity: 1; transform: none; transition-delay: 400ms; }
+  body.is-ready .col-about .elsewhere   { opacity: 1; transform: none; transition-delay: 480ms; }
+  body.is-ready .col-work section:nth-of-type(1) { opacity: 1; transform: none; transition-delay: 200ms; }
+  body.is-ready .col-work section:nth-of-type(2) { opacity: 1; transform: none; transition-delay: 300ms; }
+  body.is-ready .col-work section:nth-of-type(3) { opacity: 1; transform: none; transition-delay: 400ms; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .col-about .name,
+    .col-about .intro,
+    .col-about .interests,
+    .col-about .elsewhere,
+    .col-work section { opacity: 1 !important; transform: none !important; transition: none !important; }
   }
 
   /* Stroke-circle cursor with jelly (spring) follow.
@@ -899,6 +946,14 @@
     const loader = document.getElementById('loader');
     if (!loader) return;
 
+    // Inline head script already decided whether to show the loader (via
+     // html.show-loader). If not set, skip everything and go straight to ready.
+    if (!document.documentElement.classList.contains('show-loader')) {
+      loader.classList.add('is-gone');
+      document.body.classList.add('is-ready');
+      return;
+    }
+
     if (typeof window.PowerGlitch !== 'undefined') {
       try {
         window.PowerGlitch.glitch('.loader-eye', {
@@ -915,7 +970,10 @@
     }
 
     // No reveal transition — loader just disappears after a fixed glitch window.
-    setTimeout(() => loader.classList.add('is-gone'), 1200);
+    setTimeout(() => {
+      loader.classList.add('is-gone');
+      document.body.classList.add('is-ready');
+    }, 1200);
   })();
 
   // ---- LOGO: rotating spiral inside the eye + click burst ----
@@ -1031,6 +1089,10 @@
       // Toggle theme
       body.classList.toggle('dark');
       const isDark = body.classList.contains('dark');
+      const r = document.documentElement;
+      r.classList.toggle('dark', isDark);
+      r.classList.toggle('theme-dark', isDark);
+      r.classList.toggle('theme-light', !isDark);
       localStorage.setItem('theme', isDark ? 'dark' : 'light');
       const tc = document.getElementById('themeColorMeta');
       if (tc) tc.setAttribute('content', isDark ? '#0e0e0e' : '#fbfbfb');
@@ -1226,7 +1288,10 @@
       return;
     }
 
-    const LOADER_DELAY = 1200;     // matches loader removal timeout
+    // If the loader is being skipped (internal nav), reveal kicks in immediately.
+    const loader = document.getElementById('loader');
+    const loaderSkipped = !loader || loader.classList.contains('is-gone');
+    const LOADER_DELAY = loaderSkipped ? 100 : 1200;
     const STAGGER = 100;           // ms between cards on first paint
     const revealed = new WeakSet();
 

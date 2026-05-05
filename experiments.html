@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<script>(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;if(d){r.classList.add('dark');r.style.background='#0e0e0e';r.style.colorScheme='dark';}else{r.style.background='#fbfbfb';r.style.colorScheme='light';}}catch(e){}})();</script>
 <meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
-<script>(function(){if(localStorage.getItem('theme')==='dark'){document.getElementById('themeColorMeta').setAttribute('content','#0e0e0e');}})();</script>
+<style>html{background:#fbfbfb;color-scheme:light;}html.dark{background:#0e0e0e;color-scheme:dark;}html.dark body{background:#0e0e0e;color:#f4f4f4;}</style>
+<script>(function(){try{if(localStorage.getItem('theme')==='dark'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#0e0e0e');}}catch(e){}})();</script>
 <meta name="description" content="experiments by ajith chandran — ai art, ethereal portraits, and visual studies." />
 <title>experiments · ajith chandran</title>
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
@@ -23,7 +25,7 @@
     --mono: "ff-attribute-mono", "JetBrains Mono", "Geist Mono", ui-monospace, monospace;
     --grotesk: "neuzeit-grotesk", "Inter", system-ui, sans-serif;
   }
-  body.dark {
+  html.dark, body.dark {
     --bg: #0e0e0e;
     --fg: #f4f4f4;
     --label: #fff;
@@ -77,9 +79,9 @@
     animation: spin 12s linear infinite;
     will-change: transform;
   }
-  body.dark .loader { background: #000; }
-  body.dark .loader-eye { color: #ffffff; }
-  body.dark .loader-eye .spiral { fill: #000000; }
+  html.dark .loader, body.dark .loader { background: #000; }
+  html.dark .loader-eye, body.dark .loader-eye { color: #ffffff; }
+  html.dark .loader-eye .spiral, body.dark .loader-eye .spiral { fill: #000000; }
   @keyframes spin {
     from { transform: translateZ(0) rotate(0deg); }
     to   { transform: translateZ(0) rotate(-360deg); }
@@ -149,21 +151,22 @@
     z-index: 100;
     display: inline-flex;
     align-items: center;
-    gap: 16px;
-    padding: 14px 20px;
+    gap: 12px;
+    padding: 9px 14px;
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
     font-family: var(--mono);
-    font-size: 13px;
+    font-size: 12px;
     letter-spacing: 0.02em;
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
   .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .lets-talk .arrow { font-size: 15px; transition: transform 0.2s ease; }
+  .lets-talk .arrow { font-size: 13px; transition: transform 0.2s ease; }
   .lets-talk:hover .arrow { transform: translate(2px, -2px); }
   @media (max-width: 720px) {
-    .lets-talk { top: 20px; right: 20px; padding: 10px 14px; font-size: 12px; gap: 12px; }
+    .lets-talk { top: 20px; right: 20px; padding: 7px 11px; font-size: 11px; gap: 10px; }
+    .lets-talk .arrow { font-size: 12px; }
   }
 
   /* ---- BACK LINK ---- */
