@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
+<script>(function(){if(localStorage.getItem('theme')==='dark'){document.getElementById('themeColorMeta').setAttribute('content','#0e0e0e');}})();</script>
 <meta name="description" content="conscious cards — 96 questions, 6 emotions. a project by ajith chandran for we reflect." />
 <title>conscious cards · ajith chandran</title>
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
@@ -421,7 +423,7 @@
   .lightbox-img {
     display: block;
     max-width: 100%;
-    max-height: calc(100vh - 160px);   /* leave room for meta + padding */
+    max-height: calc(100dvh - 160px);   /* dvh = adapts to actual viewport, including iOS UI */
     object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
@@ -459,6 +461,28 @@
   .lightbox-close { top: 24px; right: 24px; }
   .lightbox-prev  { left: 24px;  top: 50%; transform: translateY(-50%); }
   .lightbox-next  { right: 24px; top: 50%; transform: translateY(-50%); }
+
+  /* Back button — hidden on desktop (× close is enough), shown on mobile */
+  .lightbox-back {
+    position: absolute;
+    top: 16px; left: 16px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    padding: 8px 14px;
+    cursor: pointer;
+    z-index: 4;
+    display: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  .lightbox-back:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.85); }
+  @media (max-width: 900px) {
+    .lightbox-back  { display: inline-flex; align-items: center; }
+    .lightbox-close { display: none; }
+  }
   .lightbox-counter {
     color: rgba(255, 255, 255, 0.55);
     font-family: var(--mono);
@@ -482,13 +506,13 @@
     .lightbox-caption { font-size: 12px; }
   }
 
-  /* Rotate-phone hint — only on phone in portrait */
+  /* Rotate-phone hint — fades in over the lightbox, plays animation once, then fades out */
   .rotate-hint {
     position: absolute;
     inset: 0;
     background: #000;
     z-index: 3;
-    display: none;
+    display: flex;
     flex-direction: column;
     align-items: center; justify-content: center;
     gap: 28px;
@@ -497,6 +521,15 @@
     letter-spacing: 0.04em;
     padding: 24px;
     text-align: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 500ms ease, visibility 500ms ease;
+  }
+  .lightbox.is-open.show-hint .rotate-hint {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
   .rotate-hint p {
     font-size: 13px;
@@ -510,16 +543,16 @@
   .rotate-icon {
     width: 56px; height: 76px;
     color: #fff;
-    animation: rotate-cue 2.6s cubic-bezier(0.6, 0, 0.4, 1) infinite;
     transform-origin: center;
+  }
+  /* Animation only plays while hint is visible — single shot, holds neutral after */
+  .lightbox.is-open.show-hint .rotate-icon {
+    animation: rotate-cue 2.6s cubic-bezier(0.6, 0, 0.4, 1) 1 forwards;
   }
   @keyframes rotate-cue {
     0%, 18%   { transform: rotate(0deg); }
     50%, 68%  { transform: rotate(-90deg); }
     100%      { transform: rotate(0deg); }
-  }
-  @media (max-width: 900px) and (orientation: portrait) {
-    .lightbox.is-open .rotate-hint { display: flex; }
   }
   @media (prefers-reduced-motion: reduce) {
     .rotate-icon { animation: none; }
@@ -530,6 +563,15 @@
     .lightbox-close { top: 16px; right: 16px; }
     .lightbox-prev  { left: 16px; }
     .lightbox-next  { right: 16px; }
+  }
+  /* Landscape phone — give the image as much room as possible */
+  @media (max-width: 900px) and (orientation: landscape) {
+    .lightbox-stage { padding: 16px 60px; }
+    .lightbox-img { max-height: calc(100dvh - 60px); }
+    .lightbox-meta { font-size: 11px; gap: 16px; }
+    .lightbox-close { top: 12px; right: 12px; width: 36px; height: 36px; }
+    .lightbox-prev  { left: 12px;  width: 36px; height: 36px; }
+    .lightbox-next  { right: 12px; width: 36px; height: 36px; }
   }
 
   /* ---- MOBILE: revert to page scroll, gallery becomes horizontal carousel on top ---- */
@@ -698,6 +740,7 @@
 
 <!-- Lightbox / gallery view -->
 <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="image viewer">
+  <button class="lightbox-back"  id="lightboxBack"  aria-label="back">← back</button>
   <button class="lightbox-close" id="lightboxClose" aria-label="close">×</button>
   <button class="lightbox-prev"  id="lightboxPrev"  aria-label="previous image">←</button>
   <button class="lightbox-next"  id="lightboxNext"  aria-label="next image">→</button>
@@ -807,8 +850,11 @@
     const counter  = document.getElementById('lightboxCounter');
     const captionEl = document.getElementById('lightboxCaption');
     const closeBtn = document.getElementById('lightboxClose');
+    const backBtn  = document.getElementById('lightboxBack');
     const prevBtn  = document.getElementById('lightboxPrev');
     const nextBtn  = document.getElementById('lightboxNext');
+    const portraitMQ = window.matchMedia('(max-width: 900px) and (orientation: portrait)');
+    let hintTimer;
     const items = Array.from(document.querySelectorAll('.gallery .img-frame'));
     if (!items.length) return;
 
@@ -842,9 +888,22 @@
       lightbox.setAttribute('aria-hidden', 'false');
       document.documentElement.style.overflow = 'hidden';
       document.body.style.overflow = 'hidden';
+
+      // On portrait phone: show rotate hint, animation plays once,
+      // then auto-fade after 3.2s. If the user rotates first, fade immediately.
+      clearTimeout(hintTimer);
+      lightbox.classList.remove('show-hint');
+      if (portraitMQ.matches) {
+        // Force a reflow so the animation restarts cleanly per open
+        void lightbox.offsetWidth;
+        lightbox.classList.add('show-hint');
+        hintTimer = setTimeout(() => lightbox.classList.remove('show-hint'), 3200);
+      }
     }
     function close() {
       lightbox.classList.remove('is-open');
+      lightbox.classList.remove('show-hint');
+      clearTimeout(hintTimer);
       lightbox.setAttribute('aria-hidden', 'true');
       document.documentElement.style.overflow = '';
       document.body.style.overflow = '';
@@ -855,6 +914,7 @@
     });
 
     closeBtn.addEventListener('click', close);
+    backBtn .addEventListener('click', close);
     prevBtn .addEventListener('click', () => setImage(idx - 1));
     nextBtn .addEventListener('click', () => setImage(idx + 1));
 
@@ -884,6 +944,29 @@
         if (dx < 0) setImage(idx + 1); else setImage(idx - 1);
       }
     }, { passive: true });
+
+    // Orientation change — drop the rotate hint, force image reflow
+    function onOrientationChange() {
+      if (!lightbox.classList.contains('is-open')) return;
+      // Hide hint immediately on rotate to landscape
+      if (!portraitMQ.matches) {
+        lightbox.classList.remove('show-hint');
+        clearTimeout(hintTimer);
+      }
+      // iOS Safari can hold stale vh values post-rotation — force a reflow on the image
+      stageImg.style.maxHeight = 'none';
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => { stageImg.style.maxHeight = ''; });
+      });
+    }
+    window.addEventListener('orientationchange', onOrientationChange);
+    if (screen && screen.orientation) {
+      screen.orientation.addEventListener('change', onOrientationChange);
+    }
+    // Some browsers fire matchMedia change without orientationchange — handle both
+    if (portraitMQ.addEventListener) {
+      portraitMQ.addEventListener('change', onOrientationChange);
+    }
   })();
 
   // ---- HIDE BUTTONS WITH NO HREF (data-driven) ----
@@ -904,6 +987,8 @@
       e.preventDefault();
       const dark = document.body.classList.toggle('dark');
       localStorage.setItem('theme', dark ? 'dark' : 'light');
+      const tc = document.getElementById('themeColorMeta');
+      if (tc) tc.setAttribute('content', dark ? '#0e0e0e' : '#fbfbfb');
       logo.classList.remove('glitching');
       void logo.offsetWidth;
       logo.classList.add('glitching');
