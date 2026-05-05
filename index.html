@@ -38,7 +38,7 @@
   /* In dark mode, the eye becomes muted grey instead of stark white.
      Spiral stays var(--bg) so its dark-on-grey contrast still reads. */
   body.dark .logo-wrap .eye-fill {
-    fill: #9a9a9a;
+    fill: #c8c8c8;
   }
 
   html, body {
@@ -72,9 +72,18 @@
   .col-about { padding: 40px 40px 24px; }
   .col-work  { padding: 40px 40px 24px; }
   .col-work section:last-child { margin-bottom: 0; }
-  /* col-recent: top padding matches col-work so first image aligns with "projects" heading.
+  /* col-recent: top padding matches col-work so heading aligns with sibling column h2s.
      Sides still flush; bottom bleeds. */
   .col-recent { padding-top: 40px; }
+  .col-recent > h2 {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--meta);
+    font-weight: 400;
+    letter-spacing: 0;
+    margin: 0 0 16px;
+    padding: 0;
+  }
   .col {
     display: flex;
     flex-direction: column;
@@ -99,16 +108,32 @@
   }
   .col-recent .img-card {
     display: block;
-    transform-origin: center;
-    transform: skewY(var(--skew, 0deg)) scaleY(var(--squash, 1));
-    transition: transform 180ms cubic-bezier(.2,.7,.2,1);
-    will-change: transform;
   }
   .col-recent .img-frame {
     margin-bottom: 0;
   }
+
+  /* Image reveal — bottom-to-top wipe, fires on first session visit + on scroll into view */
+  .col-recent .img-frame {
+    clip-path: inset(100% 0 0 0);
+    transform: scale(1.04);
+    transition: clip-path 700ms cubic-bezier(0.7, 0, 0.3, 1),
+                transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    will-change: clip-path, transform;
+  }
+  .col-recent .img-frame.is-revealed {
+    clip-path: inset(0 0 0 0);
+    transform: scale(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .col-recent .img-frame {
+      clip-path: none !important;
+      transform: none !important;
+      transition: none !important;
+    }
+  }
   .col-recent .img-cap {
-    padding: 12px 14px 32px;          /* generous gap before next image */
+    padding: 12px 0 32px;             /* flush with image edge */
   }
 
   .img-card {
@@ -236,23 +261,29 @@
     .logo-wrap.bursting .spike-line { animation: none; }
   }
 
-  /* "Let's talk" — fixed top-right corner of the page */
+  /* "Let's talk" — fixed top-right corner, bordered button style (smaller variant) */
   .lets-talk {
     position: fixed;
-    top: 32px;
+    top: 28px;
     right: 32px;
     z-index: 100;
-    font-family: var(--mono);
-    font-size: 13px;
-    letter-spacing: 0.04em;
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 14px;
+    border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
-    border-bottom: 1px solid var(--label);
-    transition: color 0.15s, border-color 0.15s;
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
-  .lets-talk:hover { color: var(--meta); border-color: var(--meta); }
+  .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .lets-talk .arrow { font-size: 13px; transition: transform 0.2s ease; }
+  .lets-talk:hover .arrow { transform: translate(2px, -2px); }
   @media (max-width: 720px) {
-    .lets-talk { top: 20px; right: 20px; font-size: 12px; }
+    .lets-talk { top: 20px; right: 20px; padding: 6px 12px; font-size: 11px; gap: 12px; }
   }
 
   /* Name caption — sits between logo and bio paragraphs. */
@@ -567,8 +598,10 @@
     .layout {
       grid-template-columns: 1fr;
       gap: 40px;
-      padding: 28px 20px 56px;
+      padding: 28px 24px 56px;
     }
+    /* Reset col-level padding on phone — .layout already provides side padding */
+    .col-about, .col-work { padding: 0; }
     .col-recent .img-stack {
       grid-template-columns: 1fr;
       gap: 16px;
@@ -577,7 +610,6 @@
     .logo-wrap { width: 64px; margin-bottom: 28px; }
     .intro { margin-bottom: 32px; font-size: 18px; }
     .name { font-size: 17px; }
-    .lets-talk { font-size: 14px; }
     .col-recent .img-cap { padding: 10px 0 24px; font-size: 13px; }
     section h2 { font-size: 15px; }
     section a { font-size: 18px; }
@@ -632,19 +664,19 @@
     </svg>
   </a>
 
-  <p class="name"><a class="me name-link" href="https://contra.com/surrealthing" target="_blank" rel="noopener">Ajith Chandran<span class="me-photo" aria-hidden="true" style="background-image:url('https://cdn.dribbble.com/users/380263/avatars/normal/f638e1d2bbbeb15bcb2cbeb528303f80.jpg')"></span></a></p>
+  <p class="name"><a class="me name-link" href="https://contra.com/surrealthing" target="_blank" rel="noopener">ajith chandran<span class="me-photo" aria-hidden="true" style="background-image:url('https://cdn.dribbble.com/users/380263/avatars/normal/f638e1d2bbbeb15bcb2cbeb528303f80.jpg')"></span></a></p>
 
   <p class="intro">
-    A human, doing human things.<br />
-    Mostly making art and design. Sometimes writing about it.
+    a human, doing human things.<br />
+    mostly making art and design. sometimes writing about it.
   </p>
 
   <p class="intro">
-    Building <a href="#">wereflect</a> for human connection.
+    building <a href="https://wereflect.life" target="_blank" rel="noopener">wereflect</a> for human connection.
   </p>
 
   <p class="intro">
-    <span class="me">I'm<span class="me-photo" aria-hidden="true" style="background-image:url('https://cdn.dribbble.com/users/380263/avatars/normal/f638e1d2bbbeb15bcb2cbeb528303f80.jpg')"></span></span> an independent designer, artist — looking for interesting projects in AI, design, branding and art direction.
+    <span class="me">i'm<span class="me-photo" aria-hidden="true" style="background-image:url('https://cdn.dribbble.com/users/380263/avatars/normal/f638e1d2bbbeb15bcb2cbeb528303f80.jpg')"></span></span> an independent designer and artist with 10 years of experience, looking for interesting projects in ai, design, branding and art direction.
   </p>
 
   <section class="interests">
@@ -682,8 +714,10 @@
 
 </div><!-- /.col-about -->
 
-<!-- COLUMN 2: recent works -->
+<!-- COLUMN 2: all things — unified feed of projects, experiments, photos, field notes -->
 <div class="col col-recent">
+
+  <h2>all things</h2>
 
   <div class="img-stack">
 
@@ -727,6 +761,41 @@
       <div class="img-cap">crossway · brand identity</div>
     </a>
 
+    <a class="img-card" href="https://contra.com/p/r2cMoNq3-landing-page-and-learning-platform-supercharge-life-ai" target="_blank" rel="noopener">
+      <div class="img-frame ar-16-9" data-label="09 — supercharge platform" style="background-image:url('https://media.contra.com/image/upload/w_1100,q_auto/oj0n7rqnw9odrzr91jjb.avif')"></div>
+      <div class="img-cap">supercharge · learning platform</div>
+    </a>
+
+    <a class="img-card" href="https://surrealthings.substack.com/p/nature-aesthetics-and-taste" target="_blank" rel="noopener">
+      <div class="img-frame ar-1-1" data-label="10 — nature, aesthetics & taste" style="background-image:url('https://substackcdn.com/image/fetch/$s_!TcMz!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F84f919b8-1297-4484-8574-dbee7f467bac_3072x1536.png')"></div>
+      <div class="img-cap">nature, aesthetics & taste · essay</div>
+    </a>
+
+    <a class="img-card" href="https://surrealthings.substack.com/p/creating-conscious-cards-a-journey" target="_blank" rel="noopener">
+      <div class="img-frame ar-4-3" data-label="11 — creating conscious cards" style="background-image:url('https://substackcdn.com/image/fetch/$s_!ELHR!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F2512aea0-0bb3-4b04-aa90-0b1c89ec62d8_2048x1365.jpeg')"></div>
+      <div class="img-cap">creating conscious cards · essay</div>
+    </a>
+
+    <a class="img-card" href="https://surrealthings.substack.com/p/freedom-to-create-the-we-reflect" target="_blank" rel="noopener">
+      <div class="img-frame ar-16-9" data-label="12 — the we reflect journey" style="background-image:url('https://substackcdn.com/image/fetch/$s_!4RSG!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2Fed8245c1-6c92-4e96-99a9-8b8fcafa0936_3072x1536.png')"></div>
+      <div class="img-cap">the we reflect journey · essay</div>
+    </a>
+
+    <a class="img-card" href="https://contra.com/p/r2cMoNq3-landing-page-and-learning-platform-supercharge-life-ai" target="_blank" rel="noopener">
+      <div class="img-frame ar-16-9" data-label="13 — supercharge hero" style="background-image:url('images/x-01.png')"></div>
+      <div class="img-cap">supercharge · hero</div>
+    </a>
+
+    <a class="img-card" href="https://www.instagram.com/surreally.ai/" target="_blank" rel="noopener">
+      <div class="img-frame ar-3-4" data-label="14 — stillness" style="background-image:url('images/x-02.png')"></div>
+      <div class="img-cap">stillness · photo</div>
+    </a>
+
+    <a class="img-card" href="https://www.instagram.com/surreally.ai/" target="_blank" rel="noopener">
+      <div class="img-frame ar-16-9" data-label="15 — encounter" style="background-image:url('images/x-03.png')"></div>
+      <div class="img-cap">encounter · ai art</div>
+    </a>
+
     <a class="all-projects" href="projects.html">all projects →</a>
 
   </div>
@@ -739,12 +808,24 @@
   <section>
     <h2>projects</h2>
     <ul>
-      <li><a href="entries/conscious-cards.html">conscious cards</a></li>
-      <li><a href="#">we reflect — identity</a></li>
-      <li><a href="#">sparkling mindz</a></li>
-      <li><a href="https://contra.com/surrealthing" target="_blank" rel="noopener">supercharge life ai</a></li>
-      <li><a href="https://dribbble.com/4jith" target="_blank" rel="noopener">crossway</a></li>
-      <li><a href="https://github.com/Surrealthing/beloong" target="_blank" rel="noopener">beloong</a></li>
+      <li><a href="entries/conscious-cards.html"
+             data-preview="https://media.contra.com/image/upload/w_1100,q_auto/apzvcyzhhyisczeena5d.avif"
+             data-cap="conscious cards">conscious cards</a></li>
+      <li><a href="#"
+             data-preview="https://cdn.dribbble.com/userupload/25397945/file/original-b36701178ab8425ccfa6005909d13bb9.png"
+             data-cap="we reflect">we reflect — identity</a></li>
+      <li><a href="#"
+             data-preview="https://cdn.dribbble.com/userupload/16328392/file/original-89f6591f2e6436c0c05aa6addc02ff89.png"
+             data-cap="sparkling mindz">sparkling mindz</a></li>
+      <li><a href="https://contra.com/surrealthing" target="_blank" rel="noopener"
+             data-preview="https://media.contra.com/image/upload/w_1100,q_auto/pwblhrxssrvuixocijs3.avif"
+             data-cap="supercharge life ai">supercharge life ai</a></li>
+      <li><a href="https://dribbble.com/4jith" target="_blank" rel="noopener"
+             data-preview="https://cdn.dribbble.com/userupload/25736884/file/still-112a02024f2fd2869ea65170835f423a.png"
+             data-cap="crossway">crossway</a></li>
+      <li><a href="https://github.com/Surrealthing/beloong" target="_blank" rel="noopener"
+             data-preview="https://media.contra.com/image/upload/w_1100,q_auto/l56wwkdvcwamiddpynq3.avif"
+             data-cap="beloong">beloong</a></li>
       <li class="view-all"><a href="projects.html">view all →</a></li>
     </ul>
   </section>
@@ -773,7 +854,7 @@
 
 </div><!-- /.layout -->
 
-<a class="lets-talk" href="mailto:ajithchandran4@gmail.com">Let's talk →</a>
+<a class="lets-talk" href="mailto:ajithchandran4@gmail.com"><span>let's talk</span><span class="arrow">↗</span></a>
 
 <div class="preview-pop" id="previewPop" aria-hidden="true">
   <div class="preview-img" id="previewImg"></div>
@@ -933,62 +1014,8 @@
   })();
 
 
-  // ---- Scroll-velocity distortion on the recent works column ----
-  // Tracks scroll speed, sets CSS vars --skew and --squash on the column.
-  // Cards inherit those vars and skew/scale during fast scroll, decay on stop.
-  (function () {
-    const col = document.querySelector('.col-recent');
-    if (!col) return;
 
-    const SKEW_MAX = 9;        // degrees at peak velocity
-    const SQUASH_MAX = 0.06;   // 1 - 0.94 squash at peak
-    const VELO_DIVISOR = 2.2;  // tuning: lower = more sensitive
-    const DECAY = 0.93;        // per-frame decay (closer to 1 = smoother trail-off)
-
-    let lastTop = col.scrollTop;
-    let lastTime = performance.now();
-    let skew = 0;
-    let rafId = null;
-
-    function setVars() {
-      col.style.setProperty('--skew', skew.toFixed(2) + 'deg');
-      const squashAmt = Math.min(SQUASH_MAX, Math.abs(skew) * 0.006);
-      col.style.setProperty('--squash', (1 - squashAmt).toFixed(3));
-    }
-
-    function decay() {
-      skew *= DECAY;
-      if (Math.abs(skew) < 0.05) {
-        skew = 0;
-        col.style.setProperty('--skew', '0deg');
-        col.style.setProperty('--squash', '1');
-        rafId = null;
-        return;
-      }
-      setVars();
-      rafId = requestAnimationFrame(decay);
-    }
-
-    col.addEventListener('scroll', () => {
-      const now = performance.now();
-      const dt = now - lastTime;
-      if (dt > 0) {
-        const dy = col.scrollTop - lastTop;
-        const v = dy / dt;        // px / ms (positive = scrolling down)
-        const target = Math.max(-SKEW_MAX, Math.min(SKEW_MAX, v * VELO_DIVISOR));
-        // smooth toward target rather than hard set — feels less twitchy
-        skew = skew * 0.5 + target * 0.5;
-        setVars();
-      }
-      lastTop = col.scrollTop;
-      lastTime = now;
-
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(decay);
-    }, { passive: true });
-  })();
-
-  // ---- Icon hover preview popup ----
+  // ---- Hover preview popup (icons + bio link + elsewhere + col-work lists) ----
   (function () {
     const pop = document.getElementById('previewPop');
     const img = document.getElementById('previewImg');
@@ -999,10 +1026,10 @@
     const PH  = 166;          // image (138) + caption (~28)
     const GAP = 12;
 
-    function show(icon) {
-      const rect = icon.getBoundingClientRect();
-      const previewSrc = icon.dataset.preview;
-      const capText    = icon.dataset.cap || '';
+    function show(el) {
+      const rect = el.getBoundingClientRect();
+      const previewSrc = el.dataset.preview;
+      const capText    = el.dataset.cap || '';
 
       img.style.backgroundImage = previewSrc ? `url('${previewSrc}')` : 'none';
       cap.textContent = capText;
@@ -1019,11 +1046,33 @@
     }
     function hide() { pop.classList.remove('is-show'); }
 
-    document.querySelectorAll('.icon').forEach((icon) => {
-      icon.addEventListener('mouseenter', () => show(icon));
-      icon.addEventListener('mouseleave', hide);
-      icon.addEventListener('focus',     () => show(icon));
-      icon.addEventListener('blur',      hide);
+    // Auto-resolve preview URL & caption from href when not explicitly set.
+    // Skips internal links (#, /path, entries/...) — image.thum.io can't reach them.
+    function ensurePreviewData(el) {
+      if (el.dataset.preview) return true;          // explicit override already set
+      const href = el.getAttribute('href') || '';
+      if (!/^https?:\/\//i.test(href)) return false; // internal/placeholder — no preview
+      try {
+        const host = new URL(href).hostname.replace(/^www\./, '');
+        el.dataset.preview = `https://image.thum.io/get/width/520/${href}`;
+        if (!el.dataset.cap) el.dataset.cap = host;
+        return true;
+      } catch (e) { return false; }
+    }
+
+    const SELECTORS = [
+      '.icon',                                   // interesting finds
+      '.col-about .intro a',                     // bio links (wereflect)
+      '.col-about .elsewhere ul a',              // elsewhere socials
+      '.col-work ul li:not(.view-all) a'         // projects / experiments / field notes
+    ].join(',');
+
+    document.querySelectorAll(SELECTORS).forEach((el) => {
+      if (!ensurePreviewData(el)) return;
+      el.addEventListener('mouseenter', () => show(el));
+      el.addEventListener('mouseleave', hide);
+      el.addEventListener('focus',     () => show(el));
+      el.addEventListener('blur',      hide);
     });
   })();
 
@@ -1133,6 +1182,63 @@
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
     });
+  })();
+
+  // ---- IMAGE REVEAL: bottom-to-top wipe for middle-column cards ----
+  (function () {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cards = document.querySelectorAll('.col-recent .img-frame');
+    if (!cards.length) return;
+
+    if (reduced) {
+      cards.forEach(c => c.classList.add('is-revealed'));
+      return;
+    }
+
+    const LOADER_DELAY = 1200;     // matches loader removal timeout
+    const STAGGER = 100;           // ms between cards on first paint
+    const revealed = new WeakSet();
+
+    // The middle column scrolls internally on desktop; on mobile the page scrolls.
+    // Picks the right scroll root based on overflow.
+    const colRecent = document.querySelector('.col-recent');
+    const isInternalScroll = colRecent && getComputedStyle(colRecent).overflowY === 'auto';
+    const ioRoot = isInternalScroll ? colRecent : null;
+
+    const inView = (el) => {
+      const r = el.getBoundingClientRect();
+      const containerRect = ioRoot ? ioRoot.getBoundingClientRect()
+                                   : { top: 0, bottom: window.innerHeight };
+      return r.top < containerRect.bottom && r.bottom > containerRect.top;
+    };
+
+    const reveal = (card, delay = 0) => {
+      if (revealed.has(card)) return;
+      revealed.add(card);
+      setTimeout(() => card.classList.add('is-revealed'), delay);
+    };
+
+    // After loader exits: stagger-reveal whatever is currently visible.
+    setTimeout(() => {
+      let idx = 0;
+      cards.forEach(card => {
+        if (inView(card)) reveal(card, idx++ * STAGGER);
+      });
+
+      // Cards still hidden below the fold — reveal as they scroll into view.
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !revealed.has(e.target)) {
+            reveal(e.target, 0);
+            io.unobserve(e.target);
+          }
+        });
+      }, { root: ioRoot, rootMargin: '0px 0px -8% 0px' });
+
+      cards.forEach(card => {
+        if (!revealed.has(card)) io.observe(card);
+      });
+    }, LOADER_DELAY);
   })();
 </script>
 
