@@ -263,7 +263,7 @@
     .logo-wrap.bursting .spike-line { animation: none; }
   }
 
-  /* "Let's talk" — fixed top-right corner, bordered button style (smaller variant) */
+  /* "Let's talk" — fixed top-right corner, matches action button padding */
   .lets-talk {
     position: fixed;
     top: 28px;
@@ -272,20 +272,20 @@
     display: inline-flex;
     align-items: center;
     gap: 16px;
-    padding: 8px 14px;
+    padding: 14px 20px;
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.02em;
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
   .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .lets-talk .arrow { font-size: 13px; transition: transform 0.2s ease; }
+  .lets-talk .arrow { font-size: 15px; transition: transform 0.2s ease; }
   .lets-talk:hover .arrow { transform: translate(2px, -2px); }
   @media (max-width: 720px) {
-    .lets-talk { top: 20px; right: 20px; padding: 6px 12px; font-size: 11px; gap: 12px; }
+    .lets-talk { top: 20px; right: 20px; padding: 10px 14px; font-size: 12px; gap: 12px; }
   }
 
   /* Name caption — sits between logo and bio paragraphs. */
@@ -606,7 +606,11 @@
     .col-about, .col-work { padding: 0; }
     /* When JS moves .elsewhere to the end of .layout for mobile, it becomes
        a direct grid child — restyle accordingly */
-    .layout > .elsewhere { grid-column: 1 / -1; padding: 0; margin: 0; }
+    .layout > .elsewhere {
+      grid-column: 1 / -1;
+      padding: 0;
+      margin: 32px 0 0;            /* breathing room above elsewhere */
+    }
     .layout > .elsewhere h2 { margin-bottom: 8px; }
     .col-recent .img-stack {
       grid-template-columns: 1fr;
@@ -722,8 +726,6 @@
 
 <!-- COLUMN 2: all things — unified feed of projects, experiments, photos, field notes -->
 <div class="col col-recent">
-
-  <h2>all things</h2>
 
   <div class="img-stack">
 

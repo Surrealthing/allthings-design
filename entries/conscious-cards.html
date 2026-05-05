@@ -94,7 +94,7 @@
     z-index: 5;
   }
 
-  /* "Let's talk" — fixed top-right corner, same bordered button style as homepage */
+  /* "Let's talk" — fixed top-right corner, matches the action button padding */
   .lets-talk {
     position: fixed;
     top: 28px;
@@ -103,20 +103,20 @@
     display: inline-flex;
     align-items: center;
     gap: 16px;
-    padding: 8px 14px;
+    padding: 14px 20px;
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
     font-family: var(--mono);
-    font-size: 12px;
+    font-size: 13px;
     letter-spacing: 0.02em;
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
   .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
-  .lets-talk .arrow { font-size: 13px; transition: transform 0.2s ease; }
+  .lets-talk .arrow { font-size: 15px; transition: transform 0.2s ease; }
   .lets-talk:hover .arrow { transform: translate(2px, -2px); }
   @media (max-width: 720px) {
-    .lets-talk { top: 20px; right: 20px; padding: 6px 12px; font-size: 11px; gap: 12px; }
+    .lets-talk { top: 20px; right: 20px; padding: 10px 14px; font-size: 12px; gap: 12px; }
   }
 
   .logo-wrap {
@@ -203,7 +203,7 @@
     height: 100vh;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 140px 0 60px;        /* top padding clears fixed logo */
+    padding: 200px 0 80px;        /* generous top padding — content starts well below logo */
     box-sizing: border-box;
     scrollbar-width: none;
     -ms-overflow-style: none;
@@ -218,7 +218,7 @@
   /* Gallery: snap to one image at a time, with peek of next */
   .gallery {
     scroll-snap-type: y proximity;
-    scroll-padding-top: 140px;
+    scroll-padding-top: 200px;
   }
   .gallery figure { scroll-snap-align: start; scroll-snap-stop: normal; }
 
@@ -274,6 +274,7 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    margin-top: 56px;
   }
   .btn {
     display: flex;
@@ -399,7 +400,7 @@
   .gallery .img-frame { cursor: zoom-in; }
   .lightbox {
     position: fixed; inset: 0;
-    background: rgba(0, 0, 0, 0.97);
+    background: #000;                /* fully opaque — no page bleed */
     z-index: 200;
     display: none;
     align-items: center; justify-content: center;
@@ -530,6 +531,7 @@
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    transition: none;     /* instant on — kills the glimpse of the image during fade-in */
   }
   .rotate-hint p {
     font-size: 13px;
@@ -574,6 +576,41 @@
     .lightbox-next  { right: 12px; width: 36px; height: 36px; }
   }
 
+  /* CSS rotation hack — when phone is portrait (including portrait-locked),
+     rotate the entire lightbox 90deg so the image renders in landscape.
+     User physically tilts phone clockwise to view comfortably.
+     NOTE: button positions in pre-rotation CSS map non-intuitively after rotate:
+       - pre-rotation top  → user's right
+       - pre-rotation left → user's top (viewport bottom in rotated frame)
+     Values pushed inward to clear iOS status bar (top ~50px) and home indicator (bottom ~30px). */
+  @media (max-width: 900px) and (orientation: portrait) {
+    .lightbox.is-open {
+      inset: auto;
+      width: 100vh;
+      height: 100vw;
+      top: calc((100vh - 100vw) / 2);
+      left: calc((100vw - 100vh) / 2);
+      transform: rotate(90deg);
+      transform-origin: center;
+    }
+    .lightbox.is-open .lightbox-stage { padding: 24px 64px; }
+    .lightbox.is-open .lightbox-img { max-height: calc(100vw - 80px); }
+    .lightbox.is-open .lightbox-meta { font-size: 11px; }
+    .lightbox.is-open .lightbox-back {
+      top: 24px;
+      left: 56px;          /* maps to user's top-left, clear of home indicator */
+    }
+    .lightbox.is-open .lightbox-prev,
+    .lightbox.is-open .lightbox-next {
+      width: 40px;
+      height: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .lightbox.is-open .lightbox-prev { left: 40px; right: auto; }
+    .lightbox.is-open .lightbox-next { right: 40px; left: auto; }
+  }
+
   /* ---- MOBILE: revert to page scroll, gallery becomes horizontal carousel on top ---- */
   @media (max-width: 900px) {
     html { height: auto !important; overflow: visible !important; }
@@ -590,7 +627,7 @@
       grid-template-columns: 1fr;
       gap: 32px;
       height: auto;
-      padding: 28px 0 64px;        /* no horizontal pad — gallery bleeds to edges */
+      padding: 28px 0 calc(120px + env(safe-area-inset-bottom));   /* extra room below action buttons + iOS home indicator */
     }
     .info, .gallery {
       height: auto;
@@ -692,17 +729,6 @@
       </div>
     </div>
 
-    <div class="actions reveal-up">
-      <a class="btn" id="btn-live" href="https://wereflect.life" target="_blank" rel="noopener">
-        <span>check it live</span>
-        <span class="arrow">↗</span>
-      </a>
-      <a class="btn" id="btn-case" href="https://surrealthings.substack.com/p/creating-conscious-cards-a-journey" target="_blank" rel="noopener">
-        <span>view case study</span>
-        <span class="arrow">↗</span>
-      </a>
-    </div>
-
     <section class="reveal-up">
       <h2>the approach</h2>
       <p>each card is one question. no instructions, no scoring, no app. the packaging is the entire interface — choose a card, ask the question, listen.</p>
@@ -714,6 +740,17 @@
       <p>the deck is now in circulation — used in homes, retreats, and one-on-one conversations. it became the anchor product for we reflect, shaping the brand around the question of how strangers (and partners) become honest with each other.</p>
       <p>what surprised us most: people don't put it down after one card. once the first question breaks the surface, the rest pull themselves out.</p>
     </section>
+
+    <div class="actions reveal-up">
+      <a class="btn" id="btn-live" href="https://wereflect.life" target="_blank" rel="noopener">
+        <span>check it live</span>
+        <span class="arrow">↗</span>
+      </a>
+      <a class="btn" id="btn-case" href="https://surrealthings.substack.com/p/creating-conscious-cards-a-journey" target="_blank" rel="noopener">
+        <span>view case study</span>
+        <span class="arrow">↗</span>
+      </a>
+    </div>
   </aside>
 
   <section class="gallery">
@@ -931,15 +968,22 @@
       else if (e.key === 'ArrowLeft')  setImage(idx - 1);
     });
 
-    // Swipe to navigate on mobile
+    // Swipe to navigate. When the lightbox is CSS-rotated 90° (portrait-locked phones),
+    // the user's left/right gestures register as up/down in viewport coords — swap axes.
     let touchStartX = 0, touchStartY = 0;
     lightbox.addEventListener('touchstart', (e) => {
       touchStartX = e.changedTouches[0].screenX;
       touchStartY = e.changedTouches[0].screenY;
     }, { passive: true });
     lightbox.addEventListener('touchend', (e) => {
-      const dx = e.changedTouches[0].screenX - touchStartX;
-      const dy = e.changedTouches[0].screenY - touchStartY;
+      let dx = e.changedTouches[0].screenX - touchStartX;
+      let dy = e.changedTouches[0].screenY - touchStartY;
+      if (portraitMQ.matches) {
+        // Lightbox rotated 90° CW; user tilts phone CW → user's right = viewport up (−Y)
+        const rdx = -dy;
+        const rdy =  dx;
+        dx = rdx; dy = rdy;
+      }
       if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
         if (dx < 0) setImage(idx + 1); else setImage(idx - 1);
       }
