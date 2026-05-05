@@ -289,10 +289,26 @@
     letter-spacing: 0.02em;
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
-  .btn:hover { background: var(--fg); color: var(--bg); }
+  .btn:hover {
+    background: var(--fg);
+    color: var(--bg);
+    animation: btn-glitch 0.5s steps(8) 1;
+  }
   .btn .arrow { font-size: 15px; transition: transform 0.2s ease; }
   .btn:hover .arrow { transform: translate(2px, -2px); }
   .btn.is-hidden { display: none; }
+
+  /* Small chromatic glitch — fires once on hover, matches the logo's glitch language */
+  @keyframes btn-glitch {
+    0%, 100% { filter: none; }
+    25% { filter: drop-shadow(1px 0 0 #ff0033) drop-shadow(-1px 0 0 #0066ff); }
+    50% { filter: drop-shadow(-1px 0 0 #ff0033) drop-shadow(1px 0 0 #0066ff); }
+    75% { filter: drop-shadow(1px 1px 0 #ff0033) drop-shadow(-1px -1px 0 #0066ff); }
+  }
+  .lets-talk:hover { animation: btn-glitch 0.5s steps(8) 1; }
+  @media (prefers-reduced-motion: reduce) {
+    .btn:hover, .lets-talk:hover { animation: none; }
+  }
 
   /* Long-form sections within the info column */
   .info section { margin-top: 64px; }
@@ -428,9 +444,23 @@
     object-fit: contain;
     user-select: none;
     -webkit-user-drag: none;
-    transition: opacity 180ms ease;
+    clip-path: inset(0);
+    transition: clip-path 380ms cubic-bezier(0.7, 0, 0.3, 1);
+    will-change: clip-path;
   }
-  .lightbox-img.is-fading { opacity: 0; }
+  /* Wipe out: image clipped from bottom upward */
+  .lightbox-img.is-fading { clip-path: inset(0 0 100% 0); }
+  /* Start state for incoming image: clipped from top down — set without transition,
+     then class is removed so the image wipes back into view */
+  .lightbox-img.is-wiping-in {
+    clip-path: inset(100% 0 0 0);
+    transition: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .lightbox-img,
+    .lightbox-img.is-fading,
+    .lightbox-img.is-wiping-in { clip-path: none !important; transition: none !important; }
+  }
   .lightbox-meta {
     display: flex;
     align-items: baseline;
@@ -482,7 +512,7 @@
   .lightbox-back:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.85); }
   @media (max-width: 900px) {
     .lightbox-back  { display: inline-flex; align-items: center; }
-    .lightbox-close { display: none; }
+    /* Close stays visible — user explicitly closes via back or close, not by tapping backdrop */
   }
   .lightbox-counter {
     color: rgba(255, 255, 255, 0.55);
@@ -579,10 +609,14 @@
   /* CSS rotation hack — when phone is portrait (including portrait-locked),
      rotate the entire lightbox 90deg so the image renders in landscape.
      User physically tilts phone clockwise to view comfortably.
-     NOTE: button positions in pre-rotation CSS map non-intuitively after rotate:
-       - pre-rotation top  → user's right
-       - pre-rotation left → user's top (viewport bottom in rotated frame)
-     Values pushed inward to clear iOS status bar (top ~50px) and home indicator (bottom ~30px). */
+     Pre-rotation CSS edges map non-intuitively after rotate(90deg):
+       - pre-rot bottom edge → user's TOP edge
+       - pre-rot right edge  → user's BOTTOM edge
+       - pre-rot top edge    → user's RIGHT edge
+       - pre-rot left edge   → user's LEFT edge
+     So: back at user's top-left = pre-rot bottom-right (right: 24, bottom: 24).
+         next at user's right = pre-rot left-center (left: 24, top: 50%).
+         prev at user's left  = pre-rot right-center (right: 24, top: 50%). */
   @media (max-width: 900px) and (orientation: portrait) {
     .lightbox.is-open {
       inset: auto;
@@ -596,19 +630,27 @@
     .lightbox.is-open .lightbox-stage { padding: 24px 64px; }
     .lightbox.is-open .lightbox-img { max-height: calc(100vw - 80px); }
     .lightbox.is-open .lightbox-meta { font-size: 11px; }
+
     .lightbox.is-open .lightbox-back {
-      top: 24px;
-      left: 56px;          /* maps to user's top-left, clear of home indicator */
+      top: auto; left: auto;
+      right: 24px; bottom: 24px;
+      z-index: 5;
+    }
+    .lightbox.is-open .lightbox-close {
+      top: auto; right: auto;
+      left: 24px; bottom: 24px;
+      z-index: 5;
     }
     .lightbox.is-open .lightbox-prev,
     .lightbox.is-open .lightbox-next {
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
       top: 50%;
       transform: translateY(-50%);
+      z-index: 5;
     }
-    .lightbox.is-open .lightbox-prev { left: 40px; right: auto; }
-    .lightbox.is-open .lightbox-next { right: 40px; left: auto; }
+    .lightbox.is-open .lightbox-prev { right: 24px; left: auto; }
+    .lightbox.is-open .lightbox-next { left: 24px; right: auto; }
   }
 
   /* ---- MOBILE: revert to page scroll, gallery becomes horizontal carousel on top ---- */
@@ -661,7 +703,7 @@
     }
     .gallery::-webkit-scrollbar { display: none; }
     .gallery figure {
-      flex: 0 0 74vw;              /* uniform card width — predictable swipe rhythm */
+      flex: 0 0 84vw;              /* bigger card on mobile, smaller peek of next */
       scroll-snap-align: start;
     }
     .gallery .img-frame {
@@ -905,14 +947,22 @@
 
     function setImage(i) {
       idx = (i + items.length) % items.length;
+      // Wipe out the current image (clip from bottom upward)
       stageImg.classList.add('is-fading');
       setTimeout(() => {
         stageImg.src = items[idx].src;
         stageImg.alt = items[idx].alt || '';
         counter.textContent = (idx + 1) + ' / ' + items.length;
         captionEl.textContent = captionFor(items[idx]);
+        // Set incoming image to fully clipped from top, no transition
         stageImg.classList.remove('is-fading');
-      }, 120);
+        stageImg.classList.add('is-wiping-in');
+        void stageImg.offsetHeight;            // force reflow at start state
+        requestAnimationFrame(() => {
+          // Remove no-transition class — clip-path animates back to fully visible
+          stageImg.classList.remove('is-wiping-in');
+        });
+      }, 380);
     }
 
     function open(i) {
@@ -955,10 +1005,7 @@
     prevBtn .addEventListener('click', () => setImage(idx - 1));
     nextBtn .addEventListener('click', () => setImage(idx + 1));
 
-    // Click on backdrop / stage closes
-    lightbox.addEventListener('click', (e) => {
-      if (e.target === lightbox || e.target.classList.contains('lightbox-stage')) close();
-    });
+    // Backdrop click does NOT close — explicit back / close button only.
 
     // Keyboard: ESC + arrow keys
     document.addEventListener('keydown', (e) => {
