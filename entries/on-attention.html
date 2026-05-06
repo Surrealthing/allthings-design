@@ -19,8 +19,8 @@
 <script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='dark'){r.classList.add('dark','theme-dark');}else if(t==='light'){r.classList.add('theme-light');}}catch(e){}})();</script>
 <meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
 <script>(function(){try{if(localStorage.getItem('theme')==='dark'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#0e0e0e');}}catch(e){}})();</script>
-<meta name="description" content="conscious cards — 96 questions, 6 emotions. a project by ajith chandran for we reflect." />
-<title>conscious cards · ajith chandran</title>
+<meta name="description" content="on attention — a field note on what it costs to actually look at something." />
+<title>on attention · ajith chandran</title>
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
 <style>
   :root {
@@ -749,9 +749,94 @@
       max-width: 100%;
     }
   }
+
+  /* ---- FIELD NOTE page overrides — single centered reading column ---- */
+  body.is-field-note main {
+    display: block;
+    height: 100vh;
+    padding: 0 40px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+  body.is-field-note main::-webkit-scrollbar { display: none; }
+  body.is-field-note .info {
+    height: auto;
+    overflow: visible;
+    padding: 200px 0 160px;
+    max-width: 680px;
+    margin: 0 auto;
+  }
+  body.is-field-note .gallery,
+  body.is-field-note .meta-grid,
+  body.is-field-note .actions { display: none; }
+
+  body.is-field-note .post-date {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--meta);
+    margin-bottom: 20px;
+  }
+  body.is-field-note h1 {
+    font-family: var(--mono);
+    font-size: 36px;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    margin: 0 0 32px;
+  }
+  body.is-field-note .post {
+    font-family: var(--grotesk);
+    font-size: 17px;
+    line-height: 1.65;
+    color: var(--fg);
+  }
+  body.is-field-note .post p { margin: 0 0 1.2em; }
+  body.is-field-note .post h2 {
+    font-family: var(--mono);
+    font-size: 18px;
+    letter-spacing: 0.02em;
+    margin: 2.2em 0 0.8em;
+  }
+  body.is-field-note .post blockquote {
+    margin: 1.6em 0;
+    padding-left: 20px;
+    border-left: 2px solid var(--line);
+    color: var(--meta);
+    font-style: italic;
+  }
+  body.is-field-note .post figure {
+    margin: 2em 0;
+  }
+  body.is-field-note .post figure img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  body.is-field-note .post figcaption {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    color: var(--meta);
+    margin-top: 8px;
+  }
+  body.is-field-note .post a {
+    color: var(--fg);
+    border-bottom: 1px solid var(--line);
+    transition: border-color 0.2s ease;
+  }
+  body.is-field-note .post a:hover { border-color: var(--fg); }
+
+  @media (max-width: 900px) {
+    body.is-field-note main { padding: 0 20px; }
+    body.is-field-note .info { padding: 120px 0 100px; }
+    body.is-field-note h1 { font-size: 28px; }
+    body.is-field-note .post { font-size: 16px; }
+  }
 </style>
 </head>
-<body>
+<body class="is-field-note">
 
 <header>
   <a class="logo-wrap" id="logoWrap" href="../index.html" aria-label="all things — home">
@@ -774,89 +859,34 @@
   <aside class="info">
     <a class="back-link reveal-up" href="../index.html">← back</a>
 
-    <h1 class="reveal-up">conscious cards</h1>
+    <div class="post-date reveal-up">2026 · field note</div>
 
-    <div class="desc reveal-up">
-      <p>96 questions, 6 emotions. a deck designed to help two people make space for the conversation they would otherwise avoid. the questions aren't icebreakers — they're the kind that, asked at the right moment, let someone become more honest with themselves.</p>
-      <p>the brief was simple to say and difficult to do: a card deck that doesn't feel like a wellness product, a self-help product, or a party game — and yet sits comfortably between all three.</p>
-    </div>
+    <h1 class="reveal-up">on attention</h1>
 
-    <div class="meta-grid reveal-up">
-      <div class="item">
-        <div class="label">role</div>
-        <div class="value">brand &amp; product</div>
-      </div>
-      <div class="item">
-        <div class="label">for</div>
-        <div class="value">we reflect</div>
-      </div>
-    </div>
+    <article class="post reveal-up">
+      <p>i've been thinking about what it costs to actually look at something. not the cost of finding it — that part has been engineered down to nothing — but the cost of staying.</p>
 
-    <section class="reveal-up">
-      <h2>the approach</h2>
-      <p>each card is one question. no instructions, no scoring, no app. the packaging is the entire interface — choose a card, ask the question, listen.</p>
-      <p>six emotions organize the deck — not as categories the user picks from, but as a scaffold the writer of each question worked within. the reader never sees them; they're the structure under the surface.</p>
-    </section>
+      <p>most of what i make now i make at a glance. an image lands and i've already processed whether i like it before i've decided to look. by the time i decide, i've moved on.</p>
 
-    <section class="reveal-up">
-      <h2>outcome</h2>
-      <p>the deck is now in circulation — used in homes, retreats, and one-on-one conversations. it became the anchor product for we reflect, shaping the brand around the question of how strangers (and partners) become honest with each other.</p>
-      <p>what surprised us most: people don't put it down after one card. once the first question breaks the surface, the rest pull themselves out.</p>
-    </section>
+      <h2>the trade</h2>
 
-    <div class="actions reveal-up">
-      <a class="btn" id="btn-live" href="https://wereflect.life" target="_blank" rel="noopener">
-        <span>check it live</span>
-        <span class="arrow">↗</span>
-      </a>
-      <a class="btn" id="btn-case" href="https://surrealthings.substack.com/p/creating-conscious-cards-a-journey" target="_blank" rel="noopener">
-        <span>view case study</span>
-        <span class="arrow">↗</span>
-      </a>
-    </div>
+      <p>the trade we made wasn't between attention and distraction. it was between depth and breadth. we got more, faster, and we paid in the part of looking where things actually arrive.</p>
+
+      <blockquote>"you can't see something you've already finished judging."</blockquote>
+
+      <p>i caught myself last week scrolling past a painting i'd been looking forward to seeing for two months. i closed the tab and reopened it. then i set a timer for ten minutes and didn't do anything but look at it.</p>
+
+      <p>nothing magical happened. but by minute six the painting started doing something the thumbnail couldn't have done. it didn't reveal a hidden layer. it just stopped being a thing i was processing and started being a thing i was with.</p>
+
+      <h2>practice</h2>
+
+      <p>i don't think the answer is "look at things longer." that's a prescription. what i'm trying to learn is the smaller move underneath it: noticing when i've finished looking before i've actually started.</p>
+
+      <p>that one i can do anywhere. waiting for coffee, in a museum, on a screen. you catch the moment your attention slides off and decide whether to let it.</p>
+
+      <p>most days you let it. some days you don't. the days you don't are the ones you remember.</p>
+    </article>
   </aside>
-
-  <section class="gallery">
-    <figure>
-      <img class="img-frame" src="https://media.contra.com/image/upload/w_1100,q_auto/apzvcyzhhyisczeena5d.avif" alt="the conscious cards deck on orange fabric" />
-      <figcaption class="caption">the deck — 96 questions in one box</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://cdn.dribbble.com/userupload/25397945/file/original-b36701178ab8425ccfa6005909d13bb9.png" alt="we reflect identity exploration" />
-      <figcaption class="caption">we reflect — the parent brand</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://media.contra.com/image/upload/w_1100,q_auto/l56wwkdvcwamiddpynq3.avif" alt="conscious brand banner" />
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://substackcdn.com/image/fetch/$s_!ELHR!,w_1456,c_limit,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F2512aea0-0bb3-4b04-aa90-0b1c89ec62d8_2048x1365.jpeg" alt="process notes substack post hero" />
-      <figcaption class="caption">process notes — substack</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-1/1200/900" alt="placeholder" />
-      <figcaption class="caption">placeholder — texture study</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-2/1200/1500" alt="placeholder" />
-      <figcaption class="caption">placeholder — packaging close-up</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-3/1600/900" alt="placeholder" />
-      <figcaption class="caption">placeholder — deck spread</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-4/1200/1200" alt="placeholder" />
-      <figcaption class="caption">placeholder — single card</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-5/1400/900" alt="placeholder" />
-      <figcaption class="caption">placeholder — in-use shot</figcaption>
-    </figure>
-    <figure>
-      <img class="img-frame" src="https://picsum.photos/seed/cc-detail-6/1200/1500" alt="placeholder" />
-      <figcaption class="caption">placeholder — detail crop</figcaption>
-    </figure>
-  </section>
 
 </main>
 

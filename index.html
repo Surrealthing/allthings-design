@@ -486,7 +486,10 @@
   body.is-ready .col-about .intro:nth-of-type(3) { transition-delay: 220ms; }
   body.is-ready .col-about .intro:nth-of-type(4) { transition-delay: 300ms; }
   body.is-ready .col-about .interests   { opacity: 1; transform: none; transition-delay: 400ms; }
-  body.is-ready .col-about .elsewhere   { opacity: 1; transform: none; transition-delay: 480ms; }
+  body.is-ready .col-about .now-playing { opacity: 1; transform: none; transition-delay: 460ms; }
+  body.is-ready .col-about .elsewhere   { opacity: 1; transform: none; transition-delay: 520ms; }
+  /* page-to-page fade-out on internal navigation */
+  body.is-leaving { opacity: 0; transition: opacity 280ms cubic-bezier(.4,0,.2,1); }
   body.is-ready .col-work section:nth-of-type(1) { opacity: 1; transform: none; transition-delay: 200ms; }
   body.is-ready .col-work section:nth-of-type(2) { opacity: 1; transform: none; transition-delay: 300ms; }
   body.is-ready .col-work section:nth-of-type(3) { opacity: 1; transform: none; transition-delay: 400ms; }
@@ -646,8 +649,8 @@
   @media (max-width: 720px) {
     .layout {
       grid-template-columns: 1fr;
-      gap: 40px;
-      padding: 28px 24px 56px;
+      gap: 96px;
+      padding: 28px 24px 64px;
     }
     /* Reset col-level padding on phone — .layout already provides side padding */
     .col-about, .col-work { padding: 0; }
@@ -664,7 +667,7 @@
       gap: 16px;
     }
     .col-work { gap: 28px; }
-    .logo-wrap { width: 64px; margin-bottom: 28px; }
+    .logo-wrap { width: 96px; margin-bottom: 28px; }
     .intro { margin-bottom: 32px; font-size: 18px; }
     .name { font-size: 17px; }
     .col-recent .img-cap { padding: 10px 0 24px; font-size: 13px; }
@@ -677,11 +680,182 @@
   /* ---- SMALL PHONE ≤ 420px ---- */
   @media (max-width: 420px) {
     .layout { padding: 24px 16px 48px; gap: 32px; }
-    .logo-wrap { width: 56px; margin-bottom: 24px; }
+    .logo-wrap { width: 96px; margin-bottom: 24px; }
     .intro { font-size: 17px; line-height: 1.55; }
     .name { font-size: 16px; }
     section h2 { font-size: 14px; }
     section a, section .loading { font-size: 17px; }
+  }
+
+  /* ============ NOW PLAYING (turntable) ============ */
+  .now-playing { margin-top: 28px; }
+  .np-stage { width: 110px; height: 110px; position: relative; margin: 8px 0 14px; }
+  .np-tt {
+    width: 340px; height: 340px; position: absolute; left: 0; top: 0;
+    transform: scale(0.324); transform-origin: top left;
+    cursor: pointer; overflow: visible;
+    background: linear-gradient(160deg,#fbf8f3 0%,#f3eee6 45%,#e6e0d6 100%);
+    border-radius: 44px;
+    box-shadow: 0 30px 50px rgba(0,0,0,.18), 0 12px 18px rgba(0,0,0,.12), 0 4px 6px rgba(0,0,0,.08),
+      inset 0 2px 0 rgba(255,255,255,.95), inset 0 -2px 1px rgba(0,0,0,.05),
+      inset 1px 0 1px rgba(255,255,255,.4), inset -1px 0 1px rgba(0,0,0,.05);
+  }
+  .np-tt::before { content:''; position:absolute; inset:0; border-radius:44px; pointer-events:none; opacity:.18; mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .np-tt::after { content:''; position:absolute; inset:0; border-radius:44px; pointer-events:none; opacity:.08; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.35' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  .np-bed { position:absolute; left:28px; top:34px; width:264px; height:264px;
+    background: linear-gradient(180deg,rgba(255,255,255,.05) 0%,rgba(0,0,0,.04) 50%,rgba(0,0,0,.1) 100%),
+      repeating-linear-gradient(90deg,#abafb2 0,#b8bcbf 2px,#a6aaad 3px);
+    border-radius:22px;
+    box-shadow:inset 0 4px 8px rgba(0,0,0,.22),inset 0 1px 1px rgba(0,0,0,.1),inset 0 -1px 1px rgba(255,255,255,.22),0 1px 0 rgba(255,255,255,.7);
+  }
+  .np-platter { position:absolute; left:50%; top:50%; width:272px; height:272px; transform:translate(-50%,-50%);
+    background: radial-gradient(ellipse 90% 70% at 28% 22%,#909499 0%,transparent 60%),
+      radial-gradient(circle,#7c8085 0%,#5e6267 70%,#3f4348 100%);
+    border-radius:50%;
+    box-shadow:0 2px 4px rgba(0,0,0,.25),inset 0 2px 4px rgba(0,0,0,.3),inset 0 -1px 1px rgba(255,255,255,.1);
+  }
+  .np-record { position:absolute; left:50%; top:50%; width:248px; height:248px; transform:translate(-50%,-50%);
+    background:
+      radial-gradient(ellipse 75% 55% at 26% 18%,rgba(255,255,255,.22) 0%,rgba(255,255,255,0) 58%),
+      radial-gradient(ellipse 55% 38% at 78% 82%,rgba(255,255,255,.09) 0%,rgba(255,255,255,0) 60%),
+      radial-gradient(ellipse 30% 60% at 50% 50%,rgba(255,255,255,.05) 0%,rgba(255,255,255,0) 70%),
+      radial-gradient(circle at 50% 50%,transparent 55%,rgba(0,0,0,.4) 95%,rgba(0,0,0,.6) 100%),
+      radial-gradient(circle,#252525 0%,#0a0a0a 60%,#000 100%);
+    border-radius:50%; overflow:hidden;
+    animation: np-spin 4.2s linear infinite; animation-play-state:paused;
+  }
+  .np-record::before { content:''; position:absolute; inset:8px; border-radius:50%;
+    background:repeating-radial-gradient(circle,transparent 0 1.8px,rgba(255,255,255,.06) 1.8px 2.6px,transparent 2.6px 4.8px); opacity:.7; }
+  .np-record::after { content:''; position:absolute; inset:0; border-radius:50%;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 248 248'%3E%3Cg fill='none' stroke='%23fff' stroke-opacity='0.16' stroke-width='0.6'%3E%3Ccircle cx='124' cy='124' r='112'/%3E%3Ccircle cx='124' cy='124' r='108'/%3E%3Ccircle cx='124' cy='124' r='104'/%3E%3Ccircle cx='124' cy='124' r='100'/%3E%3Ccircle cx='124' cy='124' r='96'/%3E%3Ccircle cx='124' cy='124' r='92'/%3E%3Ccircle cx='124' cy='124' r='88'/%3E%3Ccircle cx='124' cy='124' r='84'/%3E%3Ccircle cx='124' cy='124' r='80'/%3E%3Ccircle cx='124' cy='124' r='76'/%3E%3Ccircle cx='124' cy='124' r='72'/%3E%3Ccircle cx='124' cy='124' r='68'/%3E%3Ccircle cx='124' cy='124' r='64'/%3E%3Ccircle cx='124' cy='124' r='60'/%3E%3C/g%3E%3C/svg%3E");
+    opacity:.9; mix-blend-mode:screen; }
+  .np-lbl { position:absolute; left:50%; top:50%; width:98px; height:98px; transform:translate(-50%,-50%);
+    border-radius:50%; overflow:hidden; background-size:cover; background-position:center; background-color:#444;
+    border:3px solid #222; z-index:5; }
+  .np-lbl::after { content:''; position:absolute; left:50%; top:50%; width:14px; height:14px; transform:translate(-50%,-50%);
+    background:#000; border-radius:50%; }
+  .np-pin { position:absolute; left:50%; top:50%; width:7px; height:7px; transform:translate(-50%,-50%);
+    background:#ccc; border-radius:50%; z-index:3; }
+  .np-arm-base { position:absolute; right:24px; top:24px; width:54px; height:54px;
+    background:radial-gradient(circle at 32% 25%,#8a8e94 0%,#5f6268 50%,#3a3d42 100%); border-radius:50%;
+    box-shadow:0 4px 8px rgba(0,0,0,.28),0 1px 2px rgba(0,0,0,.2),inset 0 1px 1px rgba(255,255,255,.25),inset 0 -1px 1px rgba(0,0,0,.25); }
+  .np-arm-base::before { content:''; position:absolute; inset:5px; border-radius:50%;
+    background:radial-gradient(circle at 30% 25%,#f0f2f4,#b9bdc1); }
+  .np-arm-base::after { content:''; position:absolute; left:50%; top:50%; width:20px; height:20px; transform:translate(-50%,-50%);
+    background:radial-gradient(circle,#fff,#d0d3d6); border-radius:50%; }
+  .np-arm { position:absolute; right:48.75px; top:51px; width:4.5px; height:150px;
+    background:linear-gradient(90deg,#6e7278,#9ca1a7 50%,#6e7278); transform-origin:top center; transform:rotate(-8deg);
+    border-radius:2.5px; transition:transform .9s cubic-bezier(.25,.8,.25,1); z-index:10;
+    box-shadow:1px 0 2px rgba(0,0,0,.25); }
+  .np-head { position:absolute; bottom:-2px; left:-6px; width:18px; height:26px;
+    background:linear-gradient(180deg,#f0f0f0,#c9c9c9); border-radius:3px; transform:rotate(6deg);
+    box-shadow:0 1px 2px rgba(0,0,0,.3); }
+  .np-head::before { content:''; position:absolute; left:3px; bottom:4px; width:12px; height:12px;
+    background:linear-gradient(180deg,#5a9bd5,#2f6aa8); border-radius:2px; }
+  .np-vol { position:absolute; right:24px; bottom:18px; width:32px; height:32px;
+    background:radial-gradient(circle at 32% 28%,#ff8c5e 0%,#ff6a3a 55%,#cc4818 100%); border-radius:50%;
+    box-shadow:0 4px 6px rgba(0,0,0,.22),0 1px 2px rgba(0,0,0,.14),inset 0 1px 1px rgba(255,255,255,.4),inset 0 -1px 1px rgba(0,0,0,.18); }
+
+  /* Three status LEDs (lower-left of cabinet) */
+  .np-leds { position:absolute; left:24px; bottom:18px; display:flex; gap:8px; align-items:center; pointer-events:none; }
+  .np-led { width:10px; height:10px; border-radius:50%;
+    background:radial-gradient(circle at 30% 28%,#ffb88c 0%,#e26a3c 60%,#8c3a18 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.4),inset 0 -1px 1px rgba(0,0,0,.25),0 1px 1px rgba(0,0,0,.15); }
+  .np-led.led-2 { background:radial-gradient(circle at 30% 28%,#ffd070 0%,#e6a230 60%,#8c5a18 100%); }
+  .np-led.led-3 { background:radial-gradient(circle at 30% 28%,#aab5bd 0%,#6f7780 60%,#3a3f44 100%); }
+  .np-tt.np-playing .np-led {
+    background:radial-gradient(circle at 30% 28%,#9bf7af 0%,#30d158 55%,#1f9d40 100%);
+    box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 -1px 1px rgba(0,0,0,.2),0 0 8px rgba(48,209,88,.6); }
+
+  /* Music-level VU meter (bottom-center) */
+  .np-meter { position:absolute; left:50%; bottom:18px; transform:translateX(-50%); pointer-events:none;
+    width:96px; height:32px; padding:6px 8px; box-sizing:border-box;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:3px;
+    background:linear-gradient(180deg,#1a1a1a 0%,#0a0a0a 100%);
+    border-radius:6px;
+    box-shadow:inset 0 2px 3px rgba(0,0,0,.6),inset 0 -1px 1px rgba(255,255,255,.06),0 1px 0 rgba(255,255,255,.5); }
+  .np-bar { flex:1; background:linear-gradient(180deg,#5fe986 0%,#30d158 60%,#1f9d40 100%);
+    border-radius:2px; height:30%; transform-origin:bottom; transition:height 120ms ease; opacity:.55; }
+  .np-tt.np-playing .np-bar { animation: np-eq 1.1s ease-in-out infinite; opacity:1; }
+  .np-tt.np-playing .np-bar:nth-child(1) { animation-delay:0s;    animation-duration:.9s;  }
+  .np-tt.np-playing .np-bar:nth-child(2) { animation-delay:.15s;  animation-duration:1.1s; }
+  .np-tt.np-playing .np-bar:nth-child(3) { animation-delay:.05s;  animation-duration:.8s;  }
+  .np-tt.np-playing .np-bar:nth-child(4) { animation-delay:.25s;  animation-duration:1.2s; }
+  .np-tt.np-playing .np-bar:nth-child(5) { animation-delay:.1s;   animation-duration:1.0s; }
+  .np-tt.np-playing .np-bar:nth-child(6) { animation-delay:.2s;   animation-duration:.95s; }
+  .np-tt.np-playing .np-bar:nth-child(7) { animation-delay:.05s;  animation-duration:1.05s;}
+  @keyframes np-eq {
+    0%, 100% { height: 25%; }
+    25%      { height: 85%; }
+    50%      { height: 45%; }
+    75%      { height: 95%; }
+  }
+
+  .np-tt.np-playing .np-record { animation-play-state:running; }
+  .np-tt.np-playing .np-arm { transform: rotate(28deg) translateY(4px); }
+  .np-tt.np-playing .np-vol { background: radial-gradient(circle at 32% 28%,#5fe986,#30d158 55%,#1f9d40); }
+  @keyframes np-spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
+
+  .now-playing .np-info { font-size: 13px; line-height: 1.5; color: var(--meta); margin-top: 4px; }
+  .now-playing .np-info a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+  .now-playing .np-info a:hover { color: var(--label); }
+  .now-playing .np-info .np-meta { display: block; color: var(--meta); margin-top: 2px; font-size: 12px; }
+
+  /* dark theme: darken the deck + bed so it sits in the page */
+  body.dark .np-tt {
+    background: linear-gradient(160deg, #262626 0%, #1c1c1c 45%, #131313 100%);
+    box-shadow: 0 30px 50px rgba(0,0,0,.55), 0 12px 18px rgba(0,0,0,.35), 0 4px 6px rgba(0,0,0,.22),
+      inset 0 2px 0 rgba(255,255,255,.08), inset 0 -2px 1px rgba(0,0,0,.45),
+      inset 1px 0 1px rgba(255,255,255,.04), inset -1px 0 1px rgba(0,0,0,.3);
+  }
+  body.dark .np-tt::before { opacity: .12; mix-blend-mode: overlay; }
+  body.dark .np-tt::after  { opacity: .04; }
+  body.dark .np-bed {
+    background: linear-gradient(180deg, rgba(255,255,255,.03) 0%, rgba(0,0,0,.18) 100%),
+      repeating-linear-gradient(90deg, #3a3d3f 0, #45484a 2px, #34373a 3px);
+    box-shadow: inset 0 4px 8px rgba(0,0,0,.55), inset 0 1px 1px rgba(0,0,0,.3),
+      inset 0 -1px 1px rgba(255,255,255,.06), 0 1px 0 rgba(255,255,255,.06);
+  }
+  body.dark .np-platter {
+    background: radial-gradient(ellipse 90% 70% at 28% 22%, #4a4d50 0%, transparent 60%),
+      radial-gradient(circle, #36393c 0%, #25282b 70%, #16181a 100%);
+  }
+
+  /* mobile: album info to the right of the turntable */
+  @media (max-width: 720px) {
+    .now-playing {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      grid-template-areas: "title title" "stage info";
+      column-gap: 18px;
+      align-items: center;
+    }
+    .now-playing > h2 { grid-area: title; }
+    .now-playing > .np-stage { grid-area: stage; }
+    .now-playing > .np-info { grid-area: info; margin-top: 0; }
+  }
+
+  /* hidden spotify embed iframe — clipped to 0 so audio still plays */
+  #np-spotify-embed { position: absolute!important; left: 0!important; top: 0!important;
+    width: 0!important; height: 0!important; overflow: hidden!important;
+    opacity: 0!important; pointer-events: none!important; z-index: -1!important;
+    visibility: visible; }
+  #np-spotify-embed iframe { position: absolute!important; left: 0!important; top: 0!important;
+    width: 300px!important; height: 80px!important; border: 0!important; }
+
+  /* floating music notes */
+  .np-note { position: absolute; color: #fff; pointer-events: none;
+    font-family: "Apple Symbols", "Segoe UI Symbol", sans-serif;
+    text-shadow: 0 2px 8px rgba(0,0,0,.25), 0 0 12px rgba(255,255,255,.4);
+    animation: np-float-note 4s cubic-bezier(.22,.61,.36,1) forwards;
+    z-index: 30; will-change: transform, opacity; }
+  @keyframes np-float-note {
+    0%   { transform: translate(0,0) rotate(var(--r0,-6deg)) scale(.4); opacity: 0; }
+    14%  { opacity: 1; }
+    86%  { opacity: .9; }
+    100% { transform: translate(var(--dx,20px),-200px) rotate(var(--r2,18deg)) scale(.75); opacity: 0; }
   }
 </style>
 </head>
@@ -755,6 +929,38 @@
          data-preview="https://image.thum.io/get/width/520/https://lummi.ai" data-cap="lummi.ai">
         <img src="https://www.google.com/s2/favicons?sz=32&domain=lummi.ai" alt="" />
       </a>
+    </div>
+  </section>
+
+  <section class="now-playing">
+    <h2>now playing</h2>
+    <div class="np-stage">
+      <div class="np-tt" id="np-tt">
+        <div class="np-bed"></div>
+        <div class="np-platter"></div>
+        <div class="np-record"><div class="np-lbl" id="np-lbl"><div class="np-pin"></div></div></div>
+        <div class="np-arm-base"></div>
+        <div class="np-arm"><div class="np-head"></div></div>
+        <div class="np-vol"></div>
+        <div class="np-leds" aria-hidden="true">
+          <span class="np-led led-1"></span>
+          <span class="np-led led-2"></span>
+          <span class="np-led led-3"></span>
+        </div>
+        <div class="np-meter" aria-hidden="true">
+          <span class="np-bar"></span>
+          <span class="np-bar"></span>
+          <span class="np-bar"></span>
+          <span class="np-bar"></span>
+          <span class="np-bar"></span>
+          <span class="np-bar"></span>
+          <span class="np-bar"></span>
+        </div>
+      </div>
+    </div>
+    <div class="np-info">
+      <a id="np-link" href="https://open.spotify.com/album/1nvzBC1M3dlCMIxfUCBhlO" target="_blank" rel="noopener">singularity</a>
+      <span class="np-meta">jon hopkins</span>
     </div>
   </section>
 
@@ -888,10 +1094,10 @@
   <section>
     <h2>experiments</h2>
     <ul>
+      <li><a href="entries/eye-swirl.html">eye swirl — interactive logo</a></li>
       <li><a href="https://www.lummi.ai/creator/4jith" target="_blank" rel="noopener">lummi — ethereal portraits</a></li>
       <li><a href="https://www.instagram.com/surreally.ai/" target="_blank" rel="noopener">surreally — instagram</a></li>
       <li><span class="loading">flora studies, loading_</span></li>
-      <li><span class="loading">midjourney series, loading_</span></li>
       <li class="view-all"><a href="experiments.html">view all →</a></li>
     </ul>
   </section>
@@ -899,6 +1105,7 @@
   <section>
     <h2>field notes</h2>
     <ul>
+      <li><a href="entries/on-attention.html">on attention</a></li>
       <li><a href="https://surrealthings.substack.com/" target="_blank" rel="noopener">blog — journey of a lifetime, substack</a></li>
       <li><span class="loading">photo journal, loading_</span></li>
       <li class="view-all"><a href="field-notes.html">view all →</a></li>
@@ -921,24 +1128,32 @@
 <!-- powerglitch — applied to the loader eye -->
 <script src="https://unpkg.com/powerglitch@latest/dist/powerglitch.min.js"></script>
 <script>
-  // ---- MOBILE: move .elsewhere to the end of .layout so it sits at the page bottom ----
+  // ---- MOBILE: move .elsewhere and .now-playing to the end of .layout
+  //               so they sit at the page bottom (now-playing last) ----
   (function () {
     const mq = window.matchMedia('(max-width: 720px)');
-    const elsewhere = document.querySelector('.col-about .elsewhere');
+    const elsewhere  = document.querySelector('.col-about .elsewhere, .layout > .elsewhere');
+    const nowPlaying = document.querySelector('.col-about .now-playing, .layout > .now-playing');
     const layout = document.querySelector('.layout');
-    if (!elsewhere || !layout) return;
-    const colAbout = elsewhere.parentElement;
+    if (!layout) return;
+    const colAbout = document.querySelector('.col-about');
 
     function place() {
       if (mq.matches) {
-        if (elsewhere.parentElement !== layout) layout.appendChild(elsewhere);
+        // mobile: move both into .layout, now-playing LAST
+        if (elsewhere && elsewhere.parentElement !== layout) layout.appendChild(elsewhere);
+        if (nowPlaying && nowPlaying.parentElement !== layout) layout.appendChild(nowPlaying);
+        // ensure order: elsewhere then now-playing
+        if (elsewhere && nowPlaying) layout.appendChild(nowPlaying);
       } else {
-        if (elsewhere.parentElement !== colAbout) colAbout.appendChild(elsewhere);
+        // desktop: restore both back into col-about (interesting → now-playing → elsewhere)
+        if (nowPlaying && colAbout && nowPlaying.parentElement !== colAbout) colAbout.appendChild(nowPlaying);
+        if (elsewhere && colAbout && elsewhere.parentElement !== colAbout) colAbout.appendChild(elsewhere);
       }
     }
     place();
     if (mq.addEventListener) mq.addEventListener('change', place);
-    else mq.addListener(place); // older Safari fallback
+    else mq.addListener(place);
   })();
 
   // ---- LOADER: glitch the eye, then remove after the reveal animation ----
@@ -1334,9 +1549,125 @@
       cards.forEach(card => {
         if (!revealed.has(card)) io.observe(card);
       });
+
+      // safety: any card still hidden after 3.5s gets revealed unconditionally
+      setTimeout(() => {
+        cards.forEach(c => { if (!c.classList.contains('is-revealed')) c.classList.add('is-revealed'); });
+      }, 3500);
     }, LOADER_DELAY);
   })();
+
+  // ---- PAGE FADE-OUT on internal link navigation ----
+  (function () {
+    document.addEventListener('click', (e) => {
+      if (e.defaultPrevented) return;        // respect handlers that already cancelled (logo theme toggle, etc.)
+      const link = e.target.closest('a[href]');
+      if (!link) return;
+      const href = link.getAttribute('href');
+      if (!href) return;
+      if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
+      if (link.target === '_blank' || link.hasAttribute('download')) return;
+      if (link.hasAttribute('data-no-fade')) return;
+      let url;
+      try { url = new URL(link.href); } catch(_) { return; }
+      if (url.host !== location.host) return;
+      if (url.pathname === location.pathname && url.search === location.search) return;
+      e.preventDefault();
+      document.body.classList.add('is-leaving');
+      setTimeout(() => { window.location.href = link.href; }, 260);
+    });
+  })();
 </script>
+
+<!-- now playing: spotify embed -->
+<div id="np-spotify-embed"></div>
+<script>
+  (function(){
+    const ALBUM_ID = '1nvzBC1M3dlCMIxfUCBhlO';   // jon hopkins · singularity (album)
+    const ALBUM_TYPE = 'album';
+    const tt = document.getElementById('np-tt');
+    const lbl = document.getElementById('np-lbl');
+    if (!tt || !lbl) return;
+
+    // pull album art via spotify oEmbed
+    fetch(`https://open.spotify.com/oembed?url=https://open.spotify.com/${ALBUM_TYPE}/${ALBUM_ID}`)
+      .then(r => r.json())
+      .then(d => { if (d.thumbnail_url) lbl.style.backgroundImage = `url(${d.thumbnail_url})`; })
+      .catch(()=>{});
+
+    // permanent fix: hunt down any spotify iframe ANYWHERE in the document
+    // and force it offscreen via inline styles, regardless of where Spotify injects it
+    const NP_HIDE = 'position:fixed!important;left:-99999px!important;top:-99999px!important;width:300px!important;height:80px!important;border:0!important;opacity:0!important;pointer-events:none!important;z-index:-9999!important;';
+    const hideAllSpotify = () => {
+      document.querySelectorAll('iframe').forEach(f => {
+        const src = f.src || '';
+        const inEmbed = f.closest('#np-spotify-embed');
+        if ((src.includes('spotify') || inEmbed) && f.dataset.npHidden !== '1') {
+          f.dataset.npHidden = '1';
+          f.setAttribute('style', NP_HIDE);
+        }
+      });
+    };
+    hideAllSpotify();
+    new MutationObserver(hideAllSpotify).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src','style'] });
+
+    let controller = null, pending = false;
+    window.onSpotifyIframeApiReady = (IFrameAPI) => {
+      const el = document.getElementById('np-spotify-embed');
+      IFrameAPI.createController(el,
+        { width: 300, height: 80, uri: `spotify:${ALBUM_TYPE}:${ALBUM_ID}` },
+        (c) => {
+          controller = c;
+          c.addListener('ready', () => { if (pending) { c.togglePlay(); pending = false; } });
+          c.addListener('playback_update', (e) => {
+            const wasPlaying = tt.classList.contains('np-playing');
+            const nowPlaying = !e.data.isPaused;
+            tt.classList.toggle('np-playing', nowPlaying);
+            if (nowPlaying && !wasPlaying) startNotes();
+          });
+        }
+      );
+    };
+    tt.addEventListener('click', () => {
+      // Immediate visual feedback so the deck animates while the iframe spins up.
+      // The 'playback_update' listener is the source of truth and will sync state.
+      tt.classList.toggle('np-playing');
+      if (!controller) { pending = true; return; }
+      controller.togglePlay();
+    });
+
+    // floating music notes — continuous while playing
+    const NOTE_SYMBOLS = ['♪','♫','♩','♬'];
+    let noteTimer = null;
+    function startNotes(){
+      if (noteTimer) return;
+      const tick = () => {
+        if (!tt.classList.contains('np-playing')) { noteTimer = null; return; }
+        spawnNote();
+        if (Math.random() < 0.35) setTimeout(spawnNote, 120 + Math.random() * 180);
+        noteTimer = setTimeout(tick, 320 + Math.random() * 520);
+      };
+      tick();
+    }
+    function spawnNote(){
+      const n = document.createElement('div');
+      n.className = 'np-note';
+      n.textContent = NOTE_SYMBOLS[Math.floor(Math.random() * NOTE_SYMBOLS.length)];
+      const x = 70 + Math.random() * 210;
+      const y = 90 + Math.random() * 110;
+      const dx = (Math.random() - 0.5) * 100;
+      n.style.left = x + 'px';
+      n.style.top = y + 'px';
+      n.style.fontSize = (20 + Math.random() * 16) + 'px';
+      n.style.setProperty('--dx', dx + 'px');
+      n.style.setProperty('--r0', ((Math.random()-0.5)*24) + 'deg');
+      n.style.setProperty('--r2', ((Math.random()-0.5)*60) + 'deg');
+      tt.appendChild(n);
+      setTimeout(() => n.remove(), 4100);
+    }
+  })();
+</script>
+<script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 
 </body>
 </html>
