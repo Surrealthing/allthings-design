@@ -72,6 +72,32 @@ export default async function handler(req, res) {
       thumbnail = data.images?.[0]?.url;
     }
 
+    // Fallback: Spotify increasingly returns null preview_url for non-app clients.
+    // iTunes Search API is public and exposes 30s previews for nearly every track.
+    if (!previewUrl && (artist || trackName || name)) {
+      try {
+        const term = encodeURIComponent(
+          [artist, trackName || name].filter(Boolean).join(' ')
+        );
+        const itunesRes = await fetch(
+          `https://itunes.apple.com/search?term=${term}&media=music&entity=song&limit=1`
+        );
+        if (itunesRes.ok) {
+          const itunes = await itunesRes.json();
+          const hit = itunes.results?.[0];
+          if (hit?.previewUrl) {
+            previewUrl = hit.previewUrl;
+            // Prefer Apple's higher-res art if Spotify didn't give one
+            if (!thumbnail && hit.artworkUrl100) {
+              thumbnail = hit.artworkUrl100.replace('100x100bb', '600x600bb');
+            }
+          }
+        }
+      } catch (_) {
+        /* swallow — we'll just return null previewUrl */
+      }
+    }
+
     res.setHeader(
       'Cache-Control',
       'public, s-maxage=3600, stale-while-revalidate=86400'
