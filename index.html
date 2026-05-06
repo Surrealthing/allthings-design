@@ -837,13 +837,8 @@
     .now-playing > .np-info { grid-area: info; margin-top: 0; }
   }
 
-  /* hidden spotify embed iframe — clipped to 0 so audio still plays */
-  #np-spotify-embed { position: absolute!important; left: 0!important; top: 0!important;
-    width: 0!important; height: 0!important; overflow: hidden!important;
-    opacity: 0!important; pointer-events: none!important; z-index: -1!important;
-    visibility: visible; }
-  #np-spotify-embed iframe { position: absolute!important; left: 0!important; top: 0!important;
-    width: 300px!important; height: 80px!important; border: 0!important; }
+  /* hidden audio element used for 30s preview playback */
+  #np-audio { display: none; }
 
   /* floating music notes */
   .np-note { position: absolute; color: #fff; pointer-events: none;
@@ -1579,62 +1574,71 @@
   })();
 </script>
 
-<!-- now playing: spotify embed -->
-<div id="np-spotify-embed"></div>
+<!-- now playing: 30s preview via /api/spotify-preview proxy + HTML5 audio -->
+<audio id="np-audio" preload="none" loop crossorigin="anonymous"></audio>
 <script>
   (function(){
-    const ALBUM_ID = '1nvzBC1M3dlCMIxfUCBhlO';   // jon hopkins · singularity (album)
+    const ALBUM_ID = '1nvzBC1M3dlCMIxfUCBhlO';   // jon hopkins · singularity
     const ALBUM_TYPE = 'album';
     const tt = document.getElementById('np-tt');
     const lbl = document.getElementById('np-lbl');
-    if (!tt || !lbl) return;
+    const audio = document.getElementById('np-audio');
+    if (!tt || !lbl || !audio) return;
 
-    // pull album art via spotify oEmbed
-    fetch(`https://open.spotify.com/oembed?url=https://open.spotify.com/${ALBUM_TYPE}/${ALBUM_ID}`)
-      .then(r => r.json())
-      .then(d => { if (d.thumbnail_url) lbl.style.backgroundImage = `url(${d.thumbnail_url})`; })
-      .catch(()=>{});
+    let metaPromise = null;
+    function loadMeta(){
+      if (metaPromise) return metaPromise;
+      metaPromise = fetch(`/api/spotify-preview?id=${ALBUM_ID}&type=${ALBUM_TYPE}`)
+        .then(r => r.ok ? r.json() : Promise.reject(r.status))
+        .then(d => {
+          if (d.thumbnail) lbl.style.backgroundImage = `url(${d.thumbnail})`;
+          if (d.previewUrl) audio.src = d.previewUrl;
+          return d;
+        })
+        .catch((err) => {
+          console.warn('[np] preview fetch failed', err);
+          metaPromise = null;     // allow retry on next click
+          throw err;
+        });
+      return metaPromise;
+    }
 
-    // permanent fix: hunt down any spotify iframe ANYWHERE in the document
-    // and force it offscreen via inline styles, regardless of where Spotify injects it
-    const NP_HIDE = 'position:fixed!important;left:-99999px!important;top:-99999px!important;width:300px!important;height:80px!important;border:0!important;opacity:0!important;pointer-events:none!important;z-index:-9999!important;';
-    const hideAllSpotify = () => {
-      document.querySelectorAll('iframe').forEach(f => {
-        const src = f.src || '';
-        const inEmbed = f.closest('#np-spotify-embed');
-        if ((src.includes('spotify') || inEmbed) && f.dataset.npHidden !== '1') {
-          f.dataset.npHidden = '1';
-          f.setAttribute('style', NP_HIDE);
-        }
-      });
-    };
-    hideAllSpotify();
-    new MutationObserver(hideAllSpotify).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['src','style'] });
+    // Fetch metadata + art on idle so the album art shows even before the user clicks.
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(() => loadMeta().catch(()=>{}), { timeout: 2000 });
+    } else {
+      setTimeout(() => loadMeta().catch(()=>{}), 800);
+    }
 
-    let controller = null, pending = false;
-    window.onSpotifyIframeApiReady = (IFrameAPI) => {
-      const el = document.getElementById('np-spotify-embed');
-      IFrameAPI.createController(el,
-        { width: 300, height: 80, uri: `spotify:${ALBUM_TYPE}:${ALBUM_ID}` },
-        (c) => {
-          controller = c;
-          c.addListener('ready', () => { if (pending) { c.togglePlay(); pending = false; } });
-          c.addListener('playback_update', (e) => {
-            const wasPlaying = tt.classList.contains('np-playing');
-            const nowPlaying = !e.data.isPaused;
-            tt.classList.toggle('np-playing', nowPlaying);
-            if (nowPlaying && !wasPlaying) startNotes();
-          });
-        }
-      );
-    };
-    tt.addEventListener('click', () => {
-      // Immediate visual feedback so the deck animates while the iframe spins up.
-      // The 'playback_update' listener is the source of truth and will sync state.
+    tt.addEventListener('click', async () => {
+      // Immediate visual feedback while we resolve the audio source.
       tt.classList.toggle('np-playing');
-      if (!controller) { pending = true; return; }
-      controller.togglePlay();
+
+      try {
+        if (!audio.src) {
+          const data = await loadMeta();
+          if (!data.previewUrl) {
+            console.warn('[np] no preview available for this track');
+            tt.classList.remove('np-playing');
+            return;
+          }
+        }
+        if (audio.paused) {
+          await audio.play();
+        } else {
+          audio.pause();
+        }
+      } catch (err) {
+        console.warn('[np] playback error', err);
+        tt.classList.remove('np-playing');
+      }
     });
+
+    // Audio element is the source of truth — sync class to actual play state.
+    audio.addEventListener('play',  () => { tt.classList.add('np-playing');    startNotes(); });
+    audio.addEventListener('playing', () => tt.classList.add('np-playing'));
+    audio.addEventListener('pause', () => tt.classList.remove('np-playing'));
+    audio.addEventListener('ended', () => tt.classList.remove('np-playing'));
 
     // floating music notes — continuous while playing
     const NOTE_SYMBOLS = ['♪','♫','♩','♬'];
@@ -1667,7 +1671,6 @@
     }
   })();
 </script>
-<script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 
 </body>
 </html>
