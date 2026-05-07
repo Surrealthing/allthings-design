@@ -130,8 +130,8 @@
   .col-recent .img-frame {
     clip-path: inset(100% 0 0 0);
     transform: scale(1.04);
-    transition: clip-path 700ms cubic-bezier(0.7, 0, 0.3, 1),
-                transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition: clip-path 420ms cubic-bezier(0.7, 0, 0.3, 1),
+                transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
     will-change: clip-path, transform;
   }
   .col-recent .img-frame.is-revealed {
@@ -769,6 +769,21 @@
     background:radial-gradient(circle at 30% 28%,#9bf7af 0%,#30d158 55%,#1f9d40 100%);
     box-shadow:inset 0 1px 1px rgba(255,255,255,.5),inset 0 -1px 1px rgba(0,0,0,.2),0 0 8px rgba(48,209,88,.6); }
 
+  /* Idle hover: gentle staggered pulse on the three LEDs */
+  @keyframes np-led-pulse {
+    0%, 60%, 100% { transform: scale(1);    filter: brightness(1); }
+    25%           { transform: scale(1.18); filter: brightness(1.45); }
+  }
+  .np-tt:not(.np-playing):hover .np-led {
+    animation: np-led-pulse 1.4s ease-in-out infinite;
+  }
+  .np-tt:not(.np-playing):hover .np-led.led-1 { animation-delay: 0s; }
+  .np-tt:not(.np-playing):hover .np-led.led-2 { animation-delay: 0.2s; }
+  .np-tt:not(.np-playing):hover .np-led.led-3 { animation-delay: 0.4s; }
+  @media (prefers-reduced-motion: reduce) {
+    .np-tt:not(.np-playing):hover .np-led { animation: none; }
+  }
+
   /* Music-level VU meter (bottom-center) */
   .np-meter { position:absolute; left:50%; bottom:18px; transform:translateX(-50%); pointer-events:none;
     width:96px; height:32px; padding:6px 8px; box-sizing:border-box;
@@ -798,8 +813,34 @@
   .np-tt.np-playing .np-vol { background: radial-gradient(circle at 32% 28%,#5fe986,#30d158 55%,#1f9d40); }
   @keyframes np-spin { to { transform: translate(-50%,-50%) rotate(360deg); } }
 
+  /* hover play/pause overlay — full circle that matches the vinyl record shape */
+  .np-play {
+    position: absolute; left: 50%; top: 50%;
+    width: 248px; height: 248px;
+    transform: translate(-50%, -50%) scale(0.92);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    display: grid; place-items: center;
+    color: rgba(255,255,255,1);
+    opacity: 0;
+    transition: opacity 220ms ease, transform 240ms cubic-bezier(0.2,0.7,0.2,1);
+    pointer-events: none;
+    z-index: 12;
+  }
+  .np-tt:hover .np-play { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .np-play svg { width: 78px; height: 78px; display: block; opacity: 0.55; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
+  .np-play .icon-pause { display: none; }
+  .np-tt.np-playing .np-play .icon-play  { display: none; }
+  .np-tt.np-playing .np-play .icon-pause { display: block; }
+  @media (prefers-reduced-motion: reduce) {
+    .np-play { transition: opacity 120ms linear; transform: translate(-50%, -50%); }
+    .np-tt:hover .np-play { transform: translate(-50%, -50%); }
+  }
+
   .now-playing .np-info { font-size: 13px; line-height: 1.5; color: var(--meta); margin-top: 4px; }
-  .now-playing .np-info a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; }
+  .now-playing .np-info a { color: var(--fg); text-decoration: underline; text-underline-offset: 3px; border-bottom: none; }
   .now-playing .np-info a:hover { color: var(--label); }
   .now-playing .np-info .np-meta { display: block; color: var(--meta); margin-top: 2px; font-size: 12px; }
 
@@ -937,6 +978,10 @@
         <div class="np-arm-base"></div>
         <div class="np-arm"><div class="np-head"></div></div>
         <div class="np-vol"></div>
+        <div class="np-play" aria-hidden="true">
+          <svg class="icon-play" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"><path d="M8 5v14l11-7z"/></svg>
+          <svg class="icon-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="4" width="4" height="16" rx="1.6"/><rect x="13" y="4" width="4" height="16" rx="1.6"/></svg>
+        </div>
         <div class="np-leds" aria-hidden="true">
           <span class="np-led led-1"></span>
           <span class="np-led led-2"></span>
@@ -1487,6 +1532,62 @@
     });
   })();
 
+  // ---- RECENT WORKS: pin first 3, shuffle the rest per-session ----
+  (function () {
+    const stack = document.querySelector('.col-recent .img-stack');
+    if (!stack) return;
+    const cards = Array.from(stack.querySelectorAll('.img-card'));
+    if (cards.length <= 3) return;
+
+    const allLink = stack.querySelector('.all-projects');
+    const pinned = cards.slice(0, 3);
+    const rest = cards.slice(3);
+    const restIdx = rest.map((_, i) => i + 3);
+
+    const key = 'allthings_recent_order_v1';
+    let order;
+    try {
+      const stored = JSON.parse(sessionStorage.getItem(key) || 'null');
+      if (Array.isArray(stored) && stored.length === restIdx.length &&
+          stored.every(i => Number.isInteger(i) && i >= 3 && i < cards.length) &&
+          new Set(stored).size === stored.length) {
+        order = stored;
+      }
+    } catch (e) {}
+
+    if (!order) {
+      const arr = restIdx.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      const typeOf = (idx) => {
+        const cap = cards[idx].querySelector('.img-cap');
+        const t = cap ? cap.textContent : '';
+        const parts = t.split('·');
+        return (parts[parts.length - 1] || '').trim();
+      };
+      // Light anti-clump pass: avoid two same-type cards in a row.
+      for (let i = 1; i < arr.length; i++) {
+        if (typeOf(arr[i]) !== typeOf(arr[i - 1])) continue;
+        for (let j = i + 1; j < arr.length; j++) {
+          const tj = typeOf(arr[j]);
+          if (tj === typeOf(arr[i - 1])) continue;
+          const tNext = i + 1 < arr.length ? typeOf(arr[i + 1]) : null;
+          if (tNext !== null && tj === tNext) continue;
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+          break;
+        }
+      }
+      order = arr;
+      try { sessionStorage.setItem(key, JSON.stringify(order)); } catch (e) {}
+    }
+
+    pinned.forEach(c => stack.appendChild(c));
+    order.forEach(i => stack.appendChild(cards[i]));
+    if (allLink) stack.appendChild(allLink);
+  })();
+
   // ---- IMAGE REVEAL: bottom-to-top wipe for middle-column cards ----
   (function () {
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1539,7 +1640,7 @@
             io.unobserve(e.target);
           }
         });
-      }, { root: ioRoot, rootMargin: '0px 0px -8% 0px' });
+      }, { root: ioRoot, rootMargin: '0px 0px 12% 0px' });
 
       cards.forEach(card => {
         if (!revealed.has(card)) io.observe(card);
