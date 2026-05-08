@@ -130,8 +130,8 @@
   .col-recent .img-frame {
     clip-path: inset(100% 0 0 0);
     transform: scale(1.04);
-    transition: clip-path 420ms cubic-bezier(0.7, 0, 0.3, 1),
-                transform 520ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition: clip-path 1100ms cubic-bezier(0.7, 0, 0.3, 1),
+                transform 1300ms cubic-bezier(0.2, 0.7, 0.2, 1);
     will-change: clip-path, transform;
   }
   .col-recent .img-frame.is-revealed {
@@ -284,6 +284,7 @@
     align-items: center;
     gap: 12px;
     padding: 9px 14px;
+    background: var(--bg);
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
@@ -1594,16 +1595,16 @@
             io.unobserve(e.target);
           }
         });
-      }, { root: ioRoot, rootMargin: '0px 0px 12% 0px' });
+      }, { root: ioRoot, rootMargin: '0px', threshold: 0 });
 
       cards.forEach(card => {
         if (!revealed.has(card)) io.observe(card);
       });
 
-      // safety: any card still hidden after 3.5s gets revealed unconditionally
+      // long-tail safety: any card still hidden after 30s gets revealed unconditionally
       setTimeout(() => {
         cards.forEach(c => { if (!c.classList.contains('is-revealed')) c.classList.add('is-revealed'); });
-      }, 3500);
+      }, 30000);
     }, LOADER_DELAY);
   })();
 

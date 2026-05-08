@@ -128,6 +128,7 @@
     align-items: center;
     gap: 12px;
     padding: 9px 14px;
+    background: var(--bg);
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
@@ -306,6 +307,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 20px;
+    background: var(--bg);
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
@@ -398,8 +400,8 @@
     clip-path: inset(100% 0 0 0);
     transform: scale(1.04);
     transition:
-      clip-path 700ms cubic-bezier(0.7, 0, 0.3, 1),
-      transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
+      clip-path 1100ms cubic-bezier(0.7, 0, 0.3, 1),
+      transform 1300ms cubic-bezier(0.2, 0.7, 0.2, 1);
     will-change: clip-path, transform;
   }
   .gallery .img-frame.is-in {
@@ -421,6 +423,7 @@
     position: fixed;
     top: 0; left: 0;
     width: 28px; height: 28px;
+    background: var(--bg);
     border: 1px solid var(--fg);
     background: var(--cursor-fill);
     border-radius: 50%;
@@ -701,7 +704,7 @@
     header { position: relative; padding: 24px 28px 0; }
     main {
       grid-template-columns: 1fr;
-      gap: 16px;
+      gap: 48px;
       height: auto;
       padding: 28px 0 calc(80px + env(safe-area-inset-bottom));   /* tightened bottom spacing on mobile */
     }
@@ -772,7 +775,6 @@
 <main>
 
   <aside class="info">
-    <a class="back-link reveal-up" href="../index.html">← back</a>
 
     <h1 class="reveal-up">superchargelife · platform</h1>
 
@@ -814,6 +816,7 @@
   <section class="gallery">
     <figure>
       <img class="img-frame" src="../img/supercharge-life-platform/01-hero-portals.jpg" alt="superchargelife landing page hero with three portals: work, health, wealth" />
+      <figcaption class="caption">landing — the three portals</figcaption>
     </figure>
     <figure>
       <img class="img-frame" src="../img/supercharge-life-platform/02-tagline.jpg" alt="tagline frame: stop doing more, start becoming more" />
@@ -823,6 +826,7 @@
     </figure>
     <figure>
       <img class="img-frame" src="../img/supercharge-life-platform/04-framework.jpg" alt="ai life os framework, the alignment layer of clarity, identity, and purpose" />
+      <figcaption class="caption">framework — the alignment layer</figcaption>
     </figure>
     <figure>
       <img class="img-frame" src="../img/supercharge-life-platform/05-course-catalog.jpg" alt="course catalog covering work, health, wealth, identity, and purpose" />
@@ -835,12 +839,13 @@
     </figure>
     <figure>
       <img class="img-frame" src="../img/supercharge-life-platform/08-course-player.jpg" alt="course player with mentorai coaching layer alongside lessons" />
+      <figcaption class="caption">course player + mentor ai</figcaption>
     </figure>
   </section>
 
 </main>
+<a class="lets-talk" href="../index.html">← back home</a>
 
-<a class="lets-talk" href="mailto:ajithchandran4@gmail.com"><span>let's talk</span><span class="arrow">↗</span></a>
 
 <!-- Lightbox / gallery view -->
 <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="image viewer">
@@ -909,8 +914,65 @@
 
   // No loader on detail pages — show content immediately so refresh
   // doesn't reveal a blank page while images load.
-  document.querySelectorAll('.reveal-up, .gallery .img-frame')
-    .forEach(el => el.classList.add('is-in'));
+  document.querySelectorAll('.reveal-up').forEach(el => el.classList.add('is-in'));
+
+  // Gallery image wipe-in: matches the homepage pattern. Lets the browser paint
+  // the clipped starting state first, then class-flips with a small stagger so the
+  // 700ms clip-path transition is visible on every image.
+  (function () {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const imgs = document.querySelectorAll('.gallery .img-frame');
+    if (!imgs.length) return;
+
+    if (reduced) {
+      imgs.forEach(el => el.classList.add('is-in'));
+      return;
+    }
+
+    const STAGGER = 90;             // ms between images currently in view
+    const START_DELAY = 120;        // wait for first paint of clipped state
+    const revealed = new WeakSet();
+
+    // The gallery column scrolls internally on desktop and horizontally on mobile —
+    // either way it's the right IO root. Falls back to window when overflow is visible.
+    const galleryEl = document.querySelector('.gallery');
+    const cs = galleryEl ? getComputedStyle(galleryEl) : null;
+    const ioRoot = (cs && (cs.overflowY === 'auto' || cs.overflowX === 'auto')) ? galleryEl : null;
+
+    const inView = (el) => {
+      const r = el.getBoundingClientRect();
+      const c = ioRoot ? ioRoot.getBoundingClientRect()
+                       : { top: 0, left: 0, right: innerWidth, bottom: innerHeight };
+      return r.bottom > c.top && r.top < c.bottom && r.right > c.left && r.left < c.right;
+    };
+
+    const reveal = (el, delay = 0) => {
+      if (revealed.has(el)) return;
+      revealed.add(el);
+      setTimeout(() => el.classList.add('is-in'), delay);
+    };
+
+    setTimeout(() => {
+      let idx = 0;
+      imgs.forEach(img => { if (inView(img)) reveal(img, idx++ * STAGGER); });
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(e => {
+          if (e.isIntersecting && !revealed.has(e.target)) {
+            reveal(e.target, 0);
+            io.unobserve(e.target);
+          }
+        });
+      }, { root: ioRoot, rootMargin: '0px', threshold: 0 });
+
+      imgs.forEach(img => { if (!revealed.has(img)) io.observe(img); });
+
+      // Long-tail safety: anything still hidden after 30s reveals unconditionally.
+      setTimeout(() => {
+        imgs.forEach(img => { if (!img.classList.contains('is-in')) img.classList.add('is-in'); });
+      }, 30000);
+    }, START_DELAY);
+  })();
 
   // ---- LIGHTBOX: click image → fullscreen viewer with prev/next + rotate hint on phone ----
   (function () {
