@@ -367,6 +367,8 @@
     display: block;
     width: 100%;
     height: auto;
+    aspect-ratio: 4 / 3;       /* reserve box before image decode so the wipe has real dimensions */
+    object-fit: cover;
     background: var(--tile);   /* fallback while loading */
   }
 
@@ -399,14 +401,14 @@
   .gallery .img-frame {
     clip-path: inset(100% 0 0 0);
     transform: scale(1.04);
-    transition:
-      clip-path 1100ms cubic-bezier(0.7, 0, 0.3, 1),
-      transform 1300ms cubic-bezier(0.2, 0.7, 0.2, 1);
     will-change: clip-path, transform;
   }
   .gallery .img-frame.is-in {
-    clip-path: inset(0 0 0 0);
-    transform: scale(1);
+    animation: gallery-wipe 1100ms cubic-bezier(0.7, 0, 0.3, 1) forwards;
+  }
+  @keyframes gallery-wipe {
+    from { clip-path: inset(100% 0 0 0); transform: scale(1.04); }
+    to   { clip-path: inset(0 0 0 0);     transform: scale(1); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -930,14 +932,14 @@
     }
 
     const STAGGER = 90;             // ms between images currently in view
-    const START_DELAY = 120;        // wait for first paint of clipped state
     const revealed = new WeakSet();
 
-    // The gallery column scrolls internally on desktop and horizontally on mobile —
-    // either way it's the right IO root. Falls back to window when overflow is visible.
+    // Use viewport (root: null) for the IO. Even when .gallery scrolls internally,
+    // each image's getBoundingClientRect updates as the gallery scrolls, so the
+    // viewport-relative observer reliably fires. Element-rooted IO turned out to
+    // miss intersections for below-the-fold images in this layout.
     const galleryEl = document.querySelector('.gallery');
-    const cs = galleryEl ? getComputedStyle(galleryEl) : null;
-    const ioRoot = (cs && (cs.overflowY === 'auto' || cs.overflowX === 'auto')) ? galleryEl : null;
+    const ioRoot = null;
 
     const inView = (el) => {
       const r = el.getBoundingClientRect();
@@ -952,26 +954,34 @@
       setTimeout(() => el.classList.add('is-in'), delay);
     };
 
-    setTimeout(() => {
+    // Run a visibility check on every scroll of the gallery. Element-rooted IO
+    // proved unreliable for below-the-fold images in this layout (overflow:auto
+    // column with scroll-snap), so a cheap rAF-throttled scroll listener does
+    // the job — same effect, simpler reasoning.
+    const checkAll = () => {
       let idx = 0;
-      imgs.forEach(img => { if (inView(img)) reveal(img, idx++ * STAGGER); });
+      for (const img of imgs) {
+        if (revealed.has(img)) continue;
+        if (inView(img)) reveal(img, idx++ * STAGGER);
+      }
+    };
 
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting && !revealed.has(e.target)) {
-            reveal(e.target, 0);
-            io.unobserve(e.target);
-          }
-        });
-      }, { root: ioRoot, rootMargin: '0px', threshold: 0 });
+    requestAnimationFrame(checkAll);
 
-      imgs.forEach(img => { if (!revealed.has(img)) io.observe(img); });
+    const scrollEl = galleryEl || window;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { checkAll(); ticking = false; });
+    };
+    scrollEl.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
 
-      // Long-tail safety: anything still hidden after 30s reveals unconditionally.
-      setTimeout(() => {
-        imgs.forEach(img => { if (!img.classList.contains('is-in')) img.classList.add('is-in'); });
-      }, 30000);
-    }, START_DELAY);
+    // Long-tail safety net: any image still hidden after 30s reveals unconditionally.
+    setTimeout(() => {
+      imgs.forEach(img => { if (!img.classList.contains('is-in')) img.classList.add('is-in'); });
+    }, 30000);
   })();
 
   // ---- LIGHTBOX: click image → fullscreen viewer with prev/next + rotate hint on phone ----
