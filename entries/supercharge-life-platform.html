@@ -984,6 +984,50 @@
     }, 30000);
   })();
 
+  // ---- JELLY WOBBLE: scroll-velocity-driven scaleY on scrollable column children ----
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Tunables (shared across both columns)
+    const PULL = 0.18;       // how fast displayed catches up to raw velocity
+    const DECAY = 0.78;      // how fast raw velocity bleeds off
+    const STRENGTH = 0.0040; // pixels of velocity → scale offset
+    const MAX = 0.13;        // ±max scale offset
+
+    function attachWobble(scrollEl, targets) {
+      if (!scrollEl || !targets.length) return;
+      let last = scrollEl.scrollTop;
+      let velocity = 0;
+      let displayed = 0;
+
+      scrollEl.addEventListener('scroll', () => {
+        const now = scrollEl.scrollTop;
+        velocity = now - last;
+        last = now;
+      }, { passive: true });
+
+      targets.forEach(t => { t.style.willChange = 'transform'; t.style.transformOrigin = 'center'; });
+
+      function tick() {
+        displayed += (velocity - displayed) * PULL;
+        velocity *= DECAY;
+        const offset = Math.max(-MAX, Math.min(MAX, displayed * STRENGTH));
+        const sy = 1 + offset;
+        const sx = 1 - offset * 0.4;
+        const t = `scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+        for (const el of targets) el.style.transform = t;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Gallery column → wobble each figure
+    attachWobble(
+      document.querySelector('.gallery'),
+      Array.from(document.querySelectorAll('.gallery figure'))
+    );
+  })();
+
   // ---- LIGHTBOX: click image → fullscreen viewer with prev/next + rotate hint on phone ----
   (function () {
     const lightbox = document.getElementById('lightbox');

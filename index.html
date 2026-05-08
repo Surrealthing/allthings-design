@@ -126,22 +126,19 @@
     margin-bottom: 0;
   }
 
-  /* Image reveal — bottom-to-top wipe, fires on first session visit + on scroll into view */
+  /* Image reveal — bottom-to-top wipe, fires on first session visit + on scroll into view.
+     Transform is left to the jelly wobble; the wipe owns only clip-path. */
   .col-recent .img-frame {
     clip-path: inset(100% 0 0 0);
-    transform: scale(1.04);
-    transition: clip-path 1100ms cubic-bezier(0.7, 0, 0.3, 1),
-                transform 1300ms cubic-bezier(0.2, 0.7, 0.2, 1);
+    transition: clip-path 1100ms cubic-bezier(0.7, 0, 0.3, 1);
     will-change: clip-path, transform;
   }
   .col-recent .img-frame.is-revealed {
     clip-path: inset(0 0 0 0);
-    transform: scale(1);
   }
   @media (prefers-reduced-motion: reduce) {
     .col-recent .img-frame {
       clip-path: none !important;
-      transform: none !important;
       transition: none !important;
     }
   }
@@ -1610,6 +1607,44 @@
         cards.forEach(c => { if (!c.classList.contains('is-revealed')) c.classList.add('is-revealed'); });
       }, 30000);
     }, LOADER_DELAY);
+  })();
+
+  // ---- JELLY WOBBLE: scroll-velocity-driven scaleY on the recent-works cards ----
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const colRecent = document.querySelector('.col-recent');
+    const cards = Array.from(document.querySelectorAll('.col-recent .img-frame'));
+    if (!cards.length) return;
+
+    // Pick the right scroll source: internal column on desktop, window on mobile.
+    const isInternalScroll = colRecent && getComputedStyle(colRecent).overflowY === 'auto';
+    const scrollEl = isInternalScroll ? colRecent : window;
+
+    const PULL = 0.18, DECAY = 0.78, STRENGTH = 0.0040, MAX = 0.13;
+
+    let last = isInternalScroll ? colRecent.scrollTop : window.scrollY;
+    let velocity = 0;
+    let displayed = 0;
+
+    scrollEl.addEventListener('scroll', () => {
+      const now = isInternalScroll ? colRecent.scrollTop : window.scrollY;
+      velocity = now - last;
+      last = now;
+    }, { passive: true });
+
+    cards.forEach(c => { c.style.willChange = 'transform'; c.style.transformOrigin = 'center'; });
+
+    function tick() {
+      displayed += (velocity - displayed) * PULL;
+      velocity *= DECAY;
+      const offset = Math.max(-MAX, Math.min(MAX, displayed * STRENGTH));
+      const sy = 1 + offset;
+      const sx = 1 - offset * 0.4;
+      const t = `scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+      for (const c of cards) c.style.transform = t;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   })();
 
   // ---- PAGE FADE-OUT on internal link navigation ----
