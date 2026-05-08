@@ -292,9 +292,16 @@
     letter-spacing: 0.02em;
     transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   }
-  .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+  .lets-talk:hover { background: var(--fg); color: var(--bg); border-color: var(--fg); animation: btn-glitch 0.5s steps(8) 1; }
   .lets-talk .arrow { font-size: 13px; transition: transform 0.2s ease; }
   .lets-talk:hover .arrow { transform: translate(2px, -2px); }
+  @keyframes btn-glitch {
+    0%, 100% { filter: none; }
+    25% { filter: drop-shadow(1px 0 0 #ff0033) drop-shadow(-1px 0 0 #0066ff); }
+    50% { filter: drop-shadow(-1px 0 0 #ff0033) drop-shadow(1px 0 0 #0066ff); }
+    75% { filter: drop-shadow(1px 1px 0 #ff0033) drop-shadow(-1px -1px 0 #0066ff); }
+  }
+  @media (prefers-reduced-motion: reduce) { .lets-talk:hover { animation: none; } }
   @media (max-width: 720px) {
     .lets-talk { top: 20px; right: 20px; padding: 7px 11px; font-size: 11px; gap: 10px; }
     .lets-talk .arrow { font-size: 12px; }

@@ -171,7 +171,7 @@
     transform-origin: center;
     will-change: transform;
     backface-visibility: hidden;
-    animation: spin 12s linear infinite reverse;
+    /* Rotation driven by JS so speed scales with cursor proximity (matches homepage). */
   }
 
   /* Eyelid blink on hover */
@@ -1078,6 +1078,44 @@
       clearTimeout(resetTimer);
       resetTimer = setTimeout(() => logo.classList.remove('glitching'), 1450);
     });
+  })();
+
+  // ---- LOGO: proximity-driven spiral spin (matches homepage CCW + cursor speed-up) ----
+  (function () {
+    const logoEl = document.getElementById('logoWrap');
+    const spiralEl = document.getElementById('logoSpiral');
+    if (!logoEl || !spiralEl) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const PROX_RADIUS = 380;
+    const SPIN_BASE = 0.5;
+    const SPIN_NEAR = 2.0;
+    let mx = -9999, my = -9999;
+    let logoCx = 0, logoCy = 0;
+    let spiralAngle = 0;
+    let spiralSpeed = SPIN_BASE;
+
+    function updateLogoCenter() {
+      const r = logoEl.getBoundingClientRect();
+      logoCx = r.left + r.width / 2;
+      logoCy = r.top + r.height / 2;
+    }
+    updateLogoCenter();
+    window.addEventListener('resize', updateLogoCenter);
+    window.addEventListener('scroll', updateLogoCenter, { passive: true, capture: true });
+    window.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; }, { passive: true });
+
+    function tick() {
+      const dx = mx - logoCx, dy = my - logoCy;
+      const linear = Math.max(0, 1 - Math.hypot(dx, dy) / PROX_RADIUS);
+      const proximity = linear * linear;
+      const target = SPIN_BASE + (SPIN_NEAR - SPIN_BASE) * proximity;
+      spiralSpeed += (target - spiralSpeed) * 0.12;
+      spiralAngle -= spiralSpeed;
+      spiralEl.style.transform = 'rotate(' + spiralAngle.toFixed(2) + 'deg)';
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   })();
 
   // ---- CURSOR: plain lerp follow with subtle squash ----
