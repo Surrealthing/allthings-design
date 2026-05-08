@@ -1580,26 +1580,30 @@
       setTimeout(() => card.classList.add('is-revealed'), delay);
     };
 
-    // After loader exits: stagger-reveal whatever is currently visible.
+    // After loader exits: walk the cards on every scroll tick and reveal as they
+    // come into view. Element-rooted IntersectionObserver proved unreliable in
+    // overflow:auto + scroll-snap layouts, so a rAF-throttled scroll listener
+    // does the same job with simpler reasoning.
     setTimeout(() => {
-      let idx = 0;
-      cards.forEach(card => {
-        if (inView(card)) reveal(card, idx++ * STAGGER);
-      });
+      const checkAll = () => {
+        let idx = 0;
+        for (const card of cards) {
+          if (revealed.has(card)) continue;
+          if (inView(card)) reveal(card, idx++ * STAGGER);
+        }
+      };
 
-      // Cards still hidden below the fold — reveal as they scroll into view.
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(e => {
-          if (e.isIntersecting && !revealed.has(e.target)) {
-            reveal(e.target, 0);
-            io.unobserve(e.target);
-          }
-        });
-      }, { root: ioRoot, rootMargin: '0px', threshold: 0 });
+      checkAll();
 
-      cards.forEach(card => {
-        if (!revealed.has(card)) io.observe(card);
-      });
+      const scrollEl = ioRoot || window;
+      let ticking = false;
+      const onScroll = () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { checkAll(); ticking = false; });
+      };
+      scrollEl.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll, { passive: true });
 
       // long-tail safety: any card still hidden after 30s gets revealed unconditionally
       setTimeout(() => {
