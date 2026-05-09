@@ -405,6 +405,13 @@
     filter: none;
     border: none;
   }
+  /* Inset large social favicons so they don't dominate the row. */
+  .icon[href*="instagram.com"] img,
+  .icon[href*="youtube.com"] img {
+    object-fit: contain;
+    padding: 4px;
+    box-sizing: border-box;
+  }
 
   /* Pin the elsewhere section to the bottom of col-about (flex column).
      margin-top: auto pushes it down inside the available space. */
