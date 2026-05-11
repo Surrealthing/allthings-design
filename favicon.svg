@@ -1,8 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -15.395 97.63 97.63">
   <style>
-    .bg { fill: #0e0e0e; }
-    .eye { fill: #f4f4f4; }
-    .spiral { fill: #0e0e0e; transform-box: fill-box; transform-origin: center; animation: spin 6s linear infinite; }
+    .bg { fill: #fbfbfb; }
+    .eye { fill: #111111; }
+    .spiral { fill: #fbfbfb; transform-box: fill-box; transform-origin: center; animation: spin 6s linear infinite; }
+    @media (prefers-color-scheme: dark) {
+      .bg { fill: #0e0e0e; }
+      .eye { fill: #f4f4f4; }
+      .spiral { fill: #0e0e0e; }
+    }
     @keyframes spin { to { transform: rotate(-360deg); } }
     @media (prefers-reduced-motion: reduce) { .spiral { animation: none; } }
   </style>
