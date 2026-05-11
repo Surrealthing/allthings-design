@@ -2,7 +2,7 @@
   <style>
     .bg { fill: #0e0e0e; }
     .eye { fill: #f4f4f4; }
-    .spiral { fill: #f4f4f4; transform-box: fill-box; transform-origin: center; animation: spin 6s linear infinite; }
+    .spiral { fill: #0e0e0e; transform-box: fill-box; transform-origin: center; animation: spin 6s linear infinite; }
     @keyframes spin { to { transform: rotate(-360deg); } }
     @media (prefers-reduced-motion: reduce) { .spiral { animation: none; } }
   </style>
