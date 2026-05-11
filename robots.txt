@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /entries/_template-project.html
+
+Sitemap: https://www.allthings.design/sitemap.xml
