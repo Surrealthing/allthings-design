@@ -5,20 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="dark light" />
 <style>
-  /* Default to system color scheme so the browser paints the correct bg
-     during navigation, BEFORE our script runs. */
-  html { background: #fbfbfb; color-scheme: light; }
-  @media (prefers-color-scheme: dark) {
-    html { background: #0e0e0e; color-scheme: dark; }
-  }
-  /* Explicit user choice (set by inline script below) wins. */
+  /* Default to dark; light is opt-in via the eye toggle. */
+  html { background: #0e0e0e; color-scheme: dark; }
   html.theme-light { background: #fbfbfb; color-scheme: light; }
   html.theme-dark  { background: #0e0e0e; color-scheme: dark; }
   html.theme-dark body { background: #0e0e0e; color: #f4f4f4; }
 </style>
-<script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='dark'){r.classList.add('dark','theme-dark');}else if(t==='light'){r.classList.add('theme-light');}}catch(e){}})();</script>
-<meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
-<script>(function(){try{if(localStorage.getItem('theme')==='dark'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#0e0e0e');}}catch(e){}})();</script>
+<script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='light'){r.classList.add('theme-light');}else{r.classList.add('dark','theme-dark');}}catch(e){}})();</script>
+<meta name="theme-color" content="#0e0e0e" id="themeColorMeta" />
+<script>(function(){try{if(localStorage.getItem('theme')==='light'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#fbfbfb');}}catch(e){}})();</script>
 <meta name="description" content="witness, a generative art and sound experiment exploring 24 forms of sacred geometry. built with claude code, p5.js and tone.js." />
 <title>witness · ajith chandran</title>
 <link rel="canonical" href="https://www.allthings.design/entries/witness" />
@@ -865,7 +860,7 @@
 <script>
   // ---- THEME (persisted from homepage) ----
   (function () {
-    if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+    if (localStorage.getItem('theme') !== 'light') document.body.classList.add('dark');
   })();
 
   // ---- SPIRAL: identical formula to homepage (barber-pole, inner edge at smaller radius) ----

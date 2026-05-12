@@ -5,20 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <meta name="color-scheme" content="dark light" />
 <style>
-  html { background: #fbfbfb; color-scheme: light; }
-  @media (prefers-color-scheme: dark) {
-    html { background: #0e0e0e; color-scheme: dark; }
-  }
+  html { background: #0e0e0e; color-scheme: dark; }
   html.theme-light { background: #fbfbfb; color-scheme: light; }
   html.theme-dark  { background: #0e0e0e; color-scheme: dark; }
   html.theme-dark body { background: #0e0e0e; color: #f4f4f4; }
 </style>
-<script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='dark'){r.classList.add('dark','theme-dark');}else if(t==='light'){r.classList.add('theme-light');}var seen=sessionStorage.getItem('at_visited')==='1';sessionStorage.setItem('at_visited','1');var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};if(!seen||nav.type!=='navigate'){r.classList.add('show-loader');}}catch(e){r.classList.add('show-loader');}})();</script>
-<meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
-<script>(function(){try{if(localStorage.getItem('theme')==='dark'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#0e0e0e');}}catch(e){}})();</script>
-<meta name="description" content="Ajith Chandran — designer working on brand, product and image-making out of Bangalore. All things design." />
-<title>Ajith Chandran — all things design</title>
+<script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='light'){r.classList.add('theme-light');}else{r.classList.add('dark','theme-dark');}var seen=sessionStorage.getItem('at_visited')==='1';sessionStorage.setItem('at_visited','1');var nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{};if(!seen||nav.type!=='navigate'){r.classList.add('show-loader');}}catch(e){r.classList.add('show-loader');}})();</script>
+<meta name="theme-color" content="#0e0e0e" id="themeColorMeta" />
+<script>(function(){try{if(localStorage.getItem('theme')==='light'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#fbfbfb');}}catch(e){}})();</script>
+<meta name="description" content="Ajith's open notebook. AI workflows, product design, branding, writing. Notes, references, and finished work in one place." />
+<title>all things design, by Ajith Chandran</title>
 <link rel="canonical" href="https://www.allthings.design/" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="all things design" />
+<meta property="og:url" content="https://www.allthings.design/" />
+<meta property="og:title" content="all things design, by Ajith Chandran" />
+<meta property="og:description" content="Ajith's open notebook. AI workflows, product design, branding, writing. Notes, references, and finished work in one place." />
+<meta property="og:image" content="https://www.allthings.design/images/og-image.png" />
+<meta property="og:image:secure_url" content="https://www.allthings.design/images/og-image.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="all things design, a personal publication by Ajith Chandran" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="https://www.allthings.design/" />
+<meta name="twitter:title" content="all things design, by Ajith Chandran" />
+<meta name="twitter:description" content="Ajith's open notebook. AI workflows, product design, branding, writing. Notes, references, and finished work in one place." />
+<meta name="twitter:image" content="https://www.allthings.design/images/og-image.png" />
+<meta name="twitter:image:alt" content="all things design, a personal publication by Ajith Chandran" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
 <style>
@@ -1264,8 +1280,8 @@
     const body = document.body;
     let resetTimer = null;
 
-    // Restore theme preference on load.
-    if (localStorage.getItem('theme') === 'dark') {
+    // Restore theme preference on load. Dark is the default; light is opt-in.
+    if (localStorage.getItem('theme') !== 'light') {
       body.classList.add('dark');
     }
 

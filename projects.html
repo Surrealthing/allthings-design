@@ -3,13 +3,32 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<script>(function(){try{var d=localStorage.getItem('theme')==='dark';var r=document.documentElement;if(d){r.classList.add('dark');r.style.background='#0e0e0e';r.style.colorScheme='dark';}else{r.style.background='#fbfbfb';r.style.colorScheme='light';}}catch(e){}})();</script>
-<meta name="theme-color" content="#fbfbfb" id="themeColorMeta" />
-<style>html{background:#fbfbfb;color-scheme:light;}html.dark{background:#0e0e0e;color-scheme:dark;}html.dark body{background:#0e0e0e;color:#f4f4f4;}</style>
-<script>(function(){try{if(localStorage.getItem('theme')==='dark'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#0e0e0e');}}catch(e){}})();</script>
-<meta name="description" content="all projects by ajith chandran — design, brand, identity, and product work." />
+<script>(function(){try{var light=localStorage.getItem('theme')==='light';var r=document.documentElement;if(light){r.style.background='#fbfbfb';r.style.colorScheme='light';}else{r.classList.add('dark');r.style.background='#0e0e0e';r.style.colorScheme='dark';}}catch(e){}})();</script>
+<meta name="theme-color" content="#0e0e0e" id="themeColorMeta" />
+<style>html{background:#0e0e0e;color-scheme:dark;}html.dark{background:#0e0e0e;color-scheme:dark;}html.dark body{background:#0e0e0e;color:#f4f4f4;}html.theme-light{background:#fbfbfb;color-scheme:light;}html.theme-light body{background:#fbfbfb;color:inherit;}</style>
+<script>(function(){try{if(localStorage.getItem('theme')==='light'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#fbfbfb');}}catch(e){}})();</script>
+<meta name="description" content="all projects by ajith chandran. design, brand, identity, and product work." />
 <title>projects · ajith chandran</title>
 <link rel="canonical" href="https://www.allthings.design/projects" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="all things design" />
+<meta property="og:url" content="https://www.allthings.design/projects" />
+<meta property="og:title" content="projects · ajith chandran" />
+<meta property="og:description" content="all projects by ajith chandran. design, brand, identity, and product work." />
+<meta property="og:image" content="https://www.allthings.design/images/og-image.png" />
+<meta property="og:image:secure_url" content="https://www.allthings.design/images/og-image.png" />
+<meta property="og:image:type" content="image/png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="all things design, a personal publication by Ajith Chandran" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:url" content="https://www.allthings.design/projects" />
+<meta name="twitter:title" content="projects · ajith chandran" />
+<meta name="twitter:description" content="all projects by ajith chandran. design, brand, identity, and product work." />
+<meta name="twitter:image" content="https://www.allthings.design/images/og-image.png" />
+<meta name="twitter:image:alt" content="all things design, a personal publication by Ajith Chandran" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
 <style>
@@ -398,7 +417,7 @@
 <script src="https://unpkg.com/powerglitch@latest/dist/powerglitch.min.js"></script>
 <script>
   // Theme persistence
-  if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
+  if (localStorage.getItem('theme') !== 'light') document.body.classList.add('dark');
 
   // Spiral generation
   function spiralRibbon(cx, cy, step, armWidth, turns, samplesPerTurn = 240) {
