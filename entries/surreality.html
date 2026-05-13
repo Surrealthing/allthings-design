@@ -125,6 +125,7 @@
     align-items: center;
     gap: 12px;
     padding: 9px 14px;
+    background: var(--bg);
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
@@ -303,6 +304,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 20px;
+    background: var(--bg);
     border: 1px solid var(--fg);
     color: var(--fg);
     text-decoration: none;
@@ -394,14 +396,14 @@
   .gallery .img-frame {
     clip-path: inset(100% 0 0 0);
     transform: scale(1.04);
-    transition:
-      clip-path 700ms cubic-bezier(0.7, 0, 0.3, 1),
-      transform 900ms cubic-bezier(0.2, 0.7, 0.2, 1);
     will-change: clip-path, transform;
   }
   .gallery .img-frame.is-in {
-    clip-path: inset(0 0 0 0);
-    transform: scale(1);
+    animation: gallery-wipe 1100ms cubic-bezier(0.7, 0, 0.3, 1) forwards;
+  }
+  @keyframes gallery-wipe {
+    from { clip-path: inset(100% 0 0 0); transform: scale(1.04); }
+    to   { clip-path: inset(0 0 0 0);     transform: scale(1); }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -418,6 +420,7 @@
     position: fixed;
     top: 0; left: 0;
     width: 28px; height: 28px;
+    background: var(--bg);
     border: 1px solid var(--fg);
     background: var(--cursor-fill);
     border-radius: 50%;
@@ -698,7 +701,7 @@
     header { position: relative; padding: 24px 28px 0; }
     main {
       grid-template-columns: 1fr;
-      gap: 16px;
+      gap: 48px;
       height: auto;
       padding: 28px 0 calc(80px + env(safe-area-inset-bottom));   /* tightened bottom spacing on mobile */
     }
@@ -746,6 +749,7 @@
       max-width: 100%;
     }
   }
+
 </style>
 </head>
 <body>
@@ -769,7 +773,6 @@
 <main>
 
   <aside class="info">
-    <a class="back-link reveal-up" href="/">← back</a>
 
     <h1 class="reveal-up">surreality</h1>
 
@@ -779,7 +782,7 @@
     </div>
 
     <div class="actions reveal-up">
-      <a class="btn" id="btn-live" href="https://surreality-world.vercel.app/" target="_blank" rel="noopener">
+      <a class="btn" href="https://surreality-world.vercel.app/" target="_blank" rel="noopener">
         <span>open the canvas</span>
         <span class="arrow">↗</span>
       </a>
@@ -788,25 +791,42 @@
 
   <section class="gallery">
     <figure>
-      <img class="img-frame" src="../img/surreality/Cover-33.jpg" alt="theyyam — glitch portrait" />
-      <figcaption class="caption">theyyam, in glitch</figcaption>
+      <img class="img-frame" src="../img/surreality/Cover-33.jpg" alt="theyyam in glitch" />
+      <figcaption class="caption">theyyam · the god, refusing to resolve</figcaption>
     </figure>
     <figure>
-      <img class="img-frame" src="../img/surreality/Cover-10.jpg" alt="figure study" />
-      <figcaption class="caption">figure, held still</figcaption>
+      <img class="img-frame" src="../img/surreality/Cover-1.jpg" alt="figure study" />
+      <figcaption class="caption">figure · held very still</figcaption>
     </figure>
     <figure>
-      <img class="img-frame" src="../img/surreality/Cover-30.jpg" alt="creature study" />
+      <img class="img-frame" src="../img/surreality/Cover-10.jpg" alt="creature study" />
+      <figcaption class="caption">creature · made of its own waiting</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="../img/surreality/Cover-20.jpg" alt="flower study" />
+      <figcaption class="caption">flower · wavy lines, slowly</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="../img/surreality/Cover-30.jpg" alt="portrait study" />
+      <figcaption class="caption">portrait · looking away</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="../img/surreality/Cover-40.jpg" alt="god study" />
+      <figcaption class="caption">a god, in dark bronze</figcaption>
     </figure>
     <figure>
       <img class="img-frame" src="../img/surreality/Cover-50.jpg" alt="portal study" />
-      <figcaption class="caption">a window, opening</figcaption>
+      <figcaption class="caption">a window, opening onto somewhere else</figcaption>
+    </figure>
+    <figure>
+      <img class="img-frame" src="../img/surreality/Cover-60.jpg" alt="element study" />
+      <figcaption class="caption">returning · to elements</figcaption>
     </figure>
   </section>
 
 </main>
+<a class="lets-talk" href="/">← back home</a>
 
-<a class="lets-talk" href="mailto:ajithchandran4@gmail.com"><span>let's talk</span><span class="arrow">↗</span></a>
 
 <!-- Lightbox / gallery view -->
 <div class="lightbox" id="lightbox" aria-hidden="true" role="dialog" aria-label="image viewer">
@@ -875,8 +895,117 @@
 
   // No loader on detail pages — show content immediately so refresh
   // doesn't reveal a blank page while images load.
-  document.querySelectorAll('.reveal-up, .gallery .img-frame')
-    .forEach(el => el.classList.add('is-in'));
+  document.querySelectorAll('.reveal-up').forEach(el => el.classList.add('is-in'));
+
+  // Gallery image wipe-in: matches the homepage pattern. Lets the browser paint
+  // the clipped starting state first, then class-flips with a small stagger so the
+  // 700ms clip-path transition is visible on every image.
+  (function () {
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const imgs = document.querySelectorAll('.gallery .img-frame');
+    if (!imgs.length) return;
+
+    if (reduced) {
+      imgs.forEach(el => el.classList.add('is-in'));
+      return;
+    }
+
+    const STAGGER = 90;             // ms between images currently in view
+    const revealed = new WeakSet();
+
+    // Use viewport (root: null) for the IO. Even when .gallery scrolls internally,
+    // each image's getBoundingClientRect updates as the gallery scrolls, so the
+    // viewport-relative observer reliably fires. Element-rooted IO turned out to
+    // miss intersections for below-the-fold images in this layout.
+    const galleryEl = document.querySelector('.gallery');
+    const ioRoot = null;
+
+    const inView = (el) => {
+      const r = el.getBoundingClientRect();
+      const c = ioRoot ? ioRoot.getBoundingClientRect()
+                       : { top: 0, left: 0, right: innerWidth, bottom: innerHeight };
+      return r.bottom > c.top && r.top < c.bottom && r.right > c.left && r.left < c.right;
+    };
+
+    const reveal = (el, delay = 0) => {
+      if (revealed.has(el)) return;
+      revealed.add(el);
+      setTimeout(() => el.classList.add('is-in'), delay);
+    };
+
+    // Run a visibility check on every scroll of the gallery. Element-rooted IO
+    // proved unreliable for below-the-fold images in this layout (overflow:auto
+    // column with scroll-snap), so a cheap rAF-throttled scroll listener does
+    // the job — same effect, simpler reasoning.
+    const checkAll = () => {
+      let idx = 0;
+      for (const img of imgs) {
+        if (revealed.has(img)) continue;
+        if (inView(img)) reveal(img, idx++ * STAGGER);
+      }
+    };
+
+    requestAnimationFrame(checkAll);
+
+    const scrollEl = galleryEl || window;
+    let ticking = false;
+    const onScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { checkAll(); ticking = false; });
+    };
+    scrollEl.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    // Long-tail safety net: any image still hidden after 30s reveals unconditionally.
+    setTimeout(() => {
+      imgs.forEach(img => { if (!img.classList.contains('is-in')) img.classList.add('is-in'); });
+    }, 30000);
+  })();
+
+  // ---- JELLY WOBBLE: scroll-velocity-driven scaleY on scrollable column children ----
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    // Tunables (shared across both columns)
+    const PULL = 0.18;       // how fast displayed catches up to raw velocity
+    const DECAY = 0.78;      // how fast raw velocity bleeds off
+    const STRENGTH = 0.0040; // pixels of velocity → scale offset
+    const MAX = 0.13;        // ±max scale offset
+
+    function attachWobble(scrollEl, targets) {
+      if (!scrollEl || !targets.length) return;
+      let last = scrollEl.scrollTop;
+      let velocity = 0;
+      let displayed = 0;
+
+      scrollEl.addEventListener('scroll', () => {
+        const now = scrollEl.scrollTop;
+        velocity = now - last;
+        last = now;
+      }, { passive: true });
+
+      targets.forEach(t => { t.style.willChange = 'transform'; t.style.transformOrigin = 'center'; });
+
+      function tick() {
+        displayed += (velocity - displayed) * PULL;
+        velocity *= DECAY;
+        const offset = Math.max(-MAX, Math.min(MAX, displayed * STRENGTH));
+        const sy = 1 + offset;
+        const sx = 1 - offset * 0.4;
+        const t = `scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+        for (const el of targets) el.style.transform = t;
+        requestAnimationFrame(tick);
+      }
+      requestAnimationFrame(tick);
+    }
+
+    // Gallery column → wobble each figure
+    attachWobble(
+      document.querySelector('.gallery'),
+      Array.from(document.querySelectorAll('.gallery figure'))
+    );
+  })();
 
   // ---- LIGHTBOX: click image → fullscreen viewer with prev/next + rotate hint on phone ----
   (function () {
@@ -1119,12 +1248,14 @@
   (function () {
     requestAnimationFrame(() => requestAnimationFrame(() => document.body.classList.add('is-loaded')));
     document.addEventListener('click', (e) => {
+      if (e.defaultPrevented) return;
       const link = e.target.closest('a[href]');
       if (!link) return;
       const href = link.getAttribute('href');
       if (!href) return;
       if (href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return;
       if (link.target === '_blank' || link.hasAttribute('download')) return;
+      if (link.hasAttribute('data-no-fade')) return;
       let url;
       try { url = new URL(link.href); } catch(_) { return; }
       if (url.host !== location.host) return;
