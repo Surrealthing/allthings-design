@@ -15,7 +15,7 @@
 <meta name="theme-color" content="#0e0e0e" id="themeColorMeta" />
 <script>(function(){try{if(localStorage.getItem('theme')==='light'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#fbfbfb');}}catch(e){}})();</script>
 <meta name="description" content="eye swirl — a small experiment with rotating spirals, click bursts, and chromatic glitch." />
-<title>eye swirl · ajith chandran</title>
+<title>eye swirl · ajith</title>
 <link rel="canonical" href="https://www.allthings.design/entries/eye-swirl" />
 <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
@@ -953,8 +953,8 @@
     // Tunables (shared across both columns)
     const PULL = 0.18;       // how fast displayed catches up to raw velocity
     const DECAY = 0.78;      // how fast raw velocity bleeds off
-    const STRENGTH = 0.0040; // pixels of velocity → scale offset
-    const MAX = 0.13;        // ±max scale offset
+    const STRENGTH = 0.0037; // pixels of velocity → scale offset
+    const MAX = 0.11;        // ±max scale offset
 
     function attachWobble(scrollEl, targets) {
       if (!scrollEl || !targets.length) return;

@@ -7,28 +7,28 @@
 <meta name="theme-color" content="#0e0e0e" id="themeColorMeta" />
 <style>html{background:#0e0e0e;color-scheme:dark;}html.dark{background:#0e0e0e;color-scheme:dark;}html.dark body{background:#0e0e0e;color:#f4f4f4;}html.theme-light{background:#fbfbfb;color-scheme:light;}html.theme-light body{background:#fbfbfb;color:inherit;}</style>
 <script>(function(){try{if(localStorage.getItem('theme')==='light'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#fbfbfb');}}catch(e){}})();</script>
-<meta name="description" content="field notes by ajith chandran. essays, photo journal, and thoughts on art, design, and consciousness." />
-<title>field notes · ajith chandran</title>
+<meta name="description" content="field notes by ajith. essays, photo journal, and thoughts on art, design, and consciousness." />
+<title>field notes · ajith</title>
 <link rel="canonical" href="https://www.allthings.design/field-notes" />
 
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="all things design" />
 <meta property="og:url" content="https://www.allthings.design/field-notes" />
-<meta property="og:title" content="field notes · ajith chandran" />
-<meta property="og:description" content="field notes by ajith chandran. essays, photo journal, and thoughts on art, design, and consciousness." />
+<meta property="og:title" content="field notes · ajith" />
+<meta property="og:description" content="field notes by ajith. essays, photo journal, and thoughts on art, design, and consciousness." />
 <meta property="og:image" content="https://www.allthings.design/images/og-image.png" />
 <meta property="og:image:secure_url" content="https://www.allthings.design/images/og-image.png" />
 <meta property="og:image:type" content="image/png" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content="all things design, a personal publication by Ajith Chandran" />
+<meta property="og:image:alt" content="all things design, a personal publication by Ajith" />
 
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:url" content="https://www.allthings.design/field-notes" />
-<meta name="twitter:title" content="field notes · ajith chandran" />
-<meta name="twitter:description" content="field notes by ajith chandran. essays, photo journal, and thoughts on art, design, and consciousness." />
+<meta name="twitter:title" content="field notes · ajith" />
+<meta name="twitter:description" content="field notes by ajith. essays, photo journal, and thoughts on art, design, and consciousness." />
 <meta name="twitter:image" content="https://www.allthings.design/images/og-image.png" />
-<meta name="twitter:image:alt" content="all things design, a personal publication by Ajith Chandran" />
+<meta name="twitter:image:alt" content="all things design, a personal publication by Ajith" />
 <link rel="icon" type="image/svg+xml" href="favicon.svg" />
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
 <style>
@@ -498,6 +498,37 @@
       el.addEventListener('mouseenter', () => cursor.classList.add('is-hover'));
       el.addEventListener('mouseleave', () => cursor.classList.remove('is-hover'));
     });
+  })();
+  // ---- JELLY WOBBLE: scroll-velocity-driven scaleY on the archive cards ----
+  // Matches the homepage feel. JS owns `transform`, so the card reveal acts as a
+  // clip-path-only wipe (its CSS transform is superseded here).
+  (function () {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cards = Array.from(document.querySelectorAll('.card .card-img'));
+    if (!cards.length) return;
+
+    const PULL = 0.18, DECAY = 0.78, STRENGTH = 0.0037, MAX = 0.11;
+    let last = window.scrollY, velocity = 0, displayed = 0;
+
+    window.addEventListener('scroll', () => {
+      const now = window.scrollY;
+      velocity = now - last;
+      last = now;
+    }, { passive: true });
+
+    cards.forEach(c => { c.style.willChange = 'transform'; c.style.transformOrigin = 'center'; });
+
+    function tick() {
+      displayed += (velocity - displayed) * PULL;
+      velocity *= DECAY;
+      const offset = Math.max(-MAX, Math.min(MAX, displayed * STRENGTH));
+      const sy = 1 + offset;
+      const sx = 1 - offset * 0.4;
+      const t = `scale(${sx.toFixed(4)}, ${sy.toFixed(4)})`;
+      for (const c of cards) c.style.transform = t;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
   })();
 </script>
 

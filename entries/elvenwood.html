@@ -14,8 +14,8 @@
 <script>(function(){try{var t=localStorage.getItem('theme');var r=document.documentElement;if(t==='light'){r.classList.add('theme-light');}else{r.classList.add('dark','theme-dark');}}catch(e){}})();</script>
 <meta name="theme-color" content="#0e0e0e" id="themeColorMeta" />
 <script>(function(){try{if(localStorage.getItem('theme')==='light'){var m=document.getElementById('themeColorMeta');if(m)m.setAttribute('content','#fbfbfb');}}catch(e){}})();</script>
-<meta name="description" content="elvenwood rebranding, a brand identity system for a homeowner-direct interiors studio. by ajith chandran." />
-<title>elvenwood · ajith chandran</title>
+<meta name="description" content="elvenwood rebranding, a brand identity system for a homeowner-direct interiors studio. by ajith." />
+<title>elvenwood · ajith</title>
 <link rel="canonical" href="https://www.allthings.design/entries/elvenwood" />
 <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
 <link rel="stylesheet" href="https://use.typekit.net/qfa8ptg.css" />
@@ -990,8 +990,8 @@
     // Tunables (shared across both columns)
     const PULL = 0.18;       // how fast displayed catches up to raw velocity
     const DECAY = 0.78;      // how fast raw velocity bleeds off
-    const STRENGTH = 0.0040; // pixels of velocity → scale offset
-    const MAX = 0.13;        // ±max scale offset
+    const STRENGTH = 0.0037; // pixels of velocity → scale offset
+    const MAX = 0.11;        // ±max scale offset
 
     function attachWobble(scrollEl, targets) {
       if (!scrollEl || !targets.length) return;
